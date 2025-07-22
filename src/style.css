@@ -19,14 +19,14 @@
   background-color: #000000;
 
   /* Text-size styles */
-  /* --font-size-XXS: 12px;
+  --font-size-XXS: 12px;
   --font-size-XS: 14px;
   --font-size-S: 16px;
   --font-size-M: 18px;
   --font-size-L: 24px;
   --font-size-XL: 28px;
   --font-size-XXL: 36px;
-  --font-size-XXXL: 50px; */
+  --font-size-XXXL: 50px;
 }
 
 body {
@@ -49,7 +49,29 @@ body {
 
 /* layout */
 .container {
-  width: 100%;
+  width: 90%;
   max-width: 1440px;
   margin: 0 auto;
+}
+
+html {
+  font-size: var(--font-size-XXS); /* 기본 크기 */
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: var(--font-size-XS);
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: var(--font-size-S);
+  }
+}
+
+@media (min-width: 1280px) {
+  html {
+    font-size: var(--font-size-M);
+  }
 }
