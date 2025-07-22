@@ -1,0 +1,21 @@
+footer {
+  background-color: var(--deepgray-color);
+  text-align: center;
+  padding: 3.75rem 0;
+
+  h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5;
+
+    em {
+      display: block;
+    }
+  }
+
+  p {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--line-color);
+  }
+}
