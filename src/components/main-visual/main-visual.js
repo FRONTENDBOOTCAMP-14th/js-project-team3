@@ -26,7 +26,7 @@ window.addEventListener("DOMContentLoaded", () => {
       "-=0.7"
     )
     .from(
-      ".visual.container p",
+      ".visual-text",
       {
         y: 50,
       },

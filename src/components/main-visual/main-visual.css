@@ -12,20 +12,20 @@
     background-size: cover;
     background-position: center;
   }
-  img {
+
+  .visual-img01 {
+    width: 18.5rem;
     display: block;
     margin-block-end: 1.25rem;
-
-    &.visual-img01 {
-      width: 18.5rem;
-    }
-
-    &.visual-img02 {
-      width: 35rem;
-    }
   }
 
-  p {
+  .visual-img02 {
+    width: 35rem;
+    display: block;
+    margin-block-end: 1.25rem;
+  }
+
+  .visual-text {
     margin-top: 2.5rem;
     line-height: 1.5;
   }
