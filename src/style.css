@@ -1,22 +1,10 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
 :root {
+  /* color styles */
   --main-color: #d52c7d;
   --deepgray-color: #1c1c1c;
   --lightgray-color: #333333;
   --font-color: #ffffff;
   --line-color: rgba(255, 255, 255, 0.3);
-
-  font-family: "Pretendard Variable";
-  line-height: 1;
-  font-weight: 400;
-
-  color: rgba(255, 255, 255);
-  background-color: #000000;
 
   /* Text-size styles */
   --font-size-XXS: 12px;
@@ -27,6 +15,20 @@
   --font-size-XL: 28px;
   --font-size-XXL: 36px;
   --font-size-XXXL: 50px;
+
+  /* basic styles */
+  font-family: "Pretendard Variable";
+  line-height: 1;
+  font-weight: 400;
+  color: rgba(255, 255, 255);
+  background-color: #000000;
+}
+
+/* 기본 속성 초기화 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
@@ -36,10 +38,18 @@ body {
 
 ul,
 ol,
-li {
+li,
+a {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  background: none;
+  border: none;
 }
 
 /* 접근성 관련 CSS */
@@ -55,7 +65,7 @@ li {
   white-space: nowrap;
 }
 
-/* layout */
+/* 반응형 layout */
 .container {
   width: 90%;
   max-width: 1440px;
@@ -63,23 +73,27 @@ li {
 }
 
 html {
-  font-size: var(--font-size-XXS); /* 기본 크기 */
+  /* 기본 크기 */
+  font-size: var(--font-size-XXS);
 }
 
 @media (min-width: 768px) {
   html {
+    /* 뷰포트 최소크기 768px 이상*/
     font-size: var(--font-size-XS);
   }
 }
 
 @media (min-width: 1024px) {
   html {
+    /* 뷰포트 최소크기 1024px 이상*/
     font-size: var(--font-size-S);
   }
 }
 
 @media (min-width: 1280px) {
   html {
+    /* 뷰포트 최소크기 1280px 이상 */
     font-size: var(--font-size-M);
   }
 }
