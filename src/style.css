@@ -97,4 +97,5 @@ html {
   html {
     /* 뷰포트 최소크기 1280px 이상 */
     font-size: var(--font-size-M);
+  }
 }
