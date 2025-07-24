@@ -54,6 +54,14 @@ a {
   border: none;
 }
 
+button {
+  color: inherit; /* 부모 색상 상속 */
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
 /* 접근성 관련 CSS */
 .sr-only {
   position: absolute;

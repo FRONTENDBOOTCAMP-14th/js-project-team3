@@ -14,15 +14,31 @@
   <body>
     <header>
       <div class="header container">
-        <a href="/" class="heade-logo">
+        <a href="/" class="header-logo">
           <img src="/public/images/logo.png" alt="GG어택 로고" />
         </a>
-        <nav class="heade-nav">
-          <ul class="heade-nav__list">
-            <li><a href="#">Team</a></li>
-            <li><a href="#">Score</a></li>
-            <li><a href="#">News</a></li>
-            <li><a href="#">Live</a></li>
+        <nav class="header-nav">
+          <ul class="header-nav__list">
+            <li>
+              <button class="nav-btn" onclick="window.routeTo('home')">
+                Team
+              </button>
+            </li>
+            <li>
+              <button class="nav-btn" onclick="window.routeTo('score')">
+                Score
+              </button>
+            </li>
+            <li>
+              <button class="nav-btn" onclick="window.routeTo('news')">
+                News
+              </button>
+            </li>
+            <li>
+              <button class="nav-btn" onclick="window.routeTo('live')">
+                Live
+              </button>
+            </li>
           </ul>
         </nav>
       </div>
