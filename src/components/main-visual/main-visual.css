@@ -1,0 +1,32 @@
+.main-visual {
+  position: relative;
+  overflow: hidden;
+  height: 695px;
+  display: flex;
+  align-items: center;
+
+  .main-visual__bg {
+    position: absolute;
+    inset: 0;
+    background-image: url("/public/images/visual.png"); /* 원하는 메인 배경 이미지 */
+    background-size: cover;
+    background-position: center;
+  }
+
+  .visual-img01 {
+    width: 18.5rem;
+    display: block;
+    margin-block-end: 1.25rem;
+  }
+
+  .visual-img02 {
+    width: 35rem;
+    display: block;
+    margin-block-end: 1.25rem;
+  }
+
+  .visual-text {
+    margin-top: 2.5rem;
+    line-height: 1.5;
+  }
+}
