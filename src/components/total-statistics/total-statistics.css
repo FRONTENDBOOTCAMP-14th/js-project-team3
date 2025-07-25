@@ -73,10 +73,15 @@
               position: absolute;
               top: 2.5rem;
               width: 100%;
+              border-bottom-left-radius: 0.375rem; /* 왼쪽 아래만 둥글게 */
+              border-bottom-right-radius: 0.375rem; /* 오른쪽 아래만 둥글게 */
 
               .match-item {
                 cursor: pointer;
                 transition: background-color 0.2s ease;
+                padding: 0.4063rem; /* 패딩 줄임 (기존보다 작게) */
+                font-size: 0.75rem; /* 폰트 크기 줄임 */
+                line-height: 1.4; /* 라인 높이 줄임 */
 
                 &:hover {
                   background-color: #eee;
