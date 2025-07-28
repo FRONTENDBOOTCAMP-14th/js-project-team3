@@ -1,0 +1,284 @@
+.card-component-wrapper {
+  border-radius: .625rem;
+  border: .125rem solid var(--lightgray-color);
+  background-color: #222;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  min-height: 0;
+  font-size: var(--font-size-S);
+  line-height: 1.5;
+}
+
+.card-header-section {
+  padding: .625rem;
+  width: 100%;
+  background-color: var(--deepgray-color);
+
+  .match-type-list {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin: 0;
+
+    .match-type-item {
+      list-style: none;
+
+      .btn-match-type {
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+        color: #666;
+        transition: color .2s ease,font-weight .2s ease;
+      }
+
+      .active {
+        color: #eaeaea;
+        font-weight: 700;
+      }
+    }
+  }
+}
+
+.card-body-section {
+  padding: .625rem;
+  width: 100%;
+
+  .match-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: .625rem;
+    min-height: 25rem;
+
+    .match-history-item {
+      display: flex;
+      flex-direction: column;
+      gap: .625rem;
+      list-style: none;
+
+      .match-preview-section {
+        display: flex;
+        border-radius: .625rem;
+        height: 6.25rem;
+        background-color: var(--deepgray-color);
+        overflow: hidden;
+
+        .match-result-box {
+          width: 1.25rem;
+        }
+
+        .match-result-box.lose {
+          background-color: #ff4d4f;
+        }
+
+        .match-result-box.win {
+          background-color: #3a96ff;
+        }
+
+        .match-result-box.draw {
+          background-color: #b03aff;
+        }
+
+        .match-padding-section {
+          display: flex;
+          padding: .625rem 0;
+          flex: 1;
+
+          .match-date-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: .25rem;
+            padding: 0 .625rem;
+            flex: .8;
+            max-width: 8.75rem;
+          }
+        }
+        
+        .match-date-text {
+          font-size: var(--font-size-XXS);
+          color: #aaa;
+        }
+        
+        .match-type-box {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          padding: 0 .625rem;
+          border-left: .0625rem solid #666;
+          flex: .9;
+          max-width: 12.5rem;
+          
+          .match-type-text {
+            color: #eaeaea;
+          }
+        }
+
+        .match-stats-section {
+          grid-column: 1/-1;
+          display: flex;
+          align-items: center;
+          padding: 0 .625rem;
+          border-left: .0625rem solid #666;
+          flex: 1;
+
+          .match-stats-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .25rem;
+            padding: 0 .625rem;
+            flex: 1;
+            max-width: 7.5rem;
+
+            .match-stats-label-text {
+              display: flex;
+              align-items: center;
+              gap: .125rem;
+              font-size: var(--font-size-XXS);
+              color: #aaa;
+
+              .icon-stat {
+                width: 1rem;
+                height: 1rem;
+              }
+            }
+          }
+        }
+
+        .btn-match-detail {
+          grid-column: 1/-1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-left: .0625rem solid #666;
+          width: 2.5rem;
+          border: none;
+          background-color: transparent;
+          cursor: pointer;
+          color: var(--font-color)
+        }
+      }
+    }
+  }
+}
+
+.user-match-detail-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  margin-bottom: 2.5rem;
+
+  .match-header-section {
+    display: flex;
+    align-items: flex-end;
+    gap: .625rem;
+
+    .match-result-text {
+      font-size: .75rem;
+    }
+
+    .win {
+      border-color: #3a96ff;
+    }
+  
+    .lose {
+      border-color: #ff4d4f;
+    }
+
+    .match-type-text {
+      font-size: .75rem;
+      color: #eaeaea;
+    }
+
+    .match-date-text {
+      margin-left: auto;
+      font-size: .75rem;
+      color: #aaa;
+    }
+
+  .match-detail-section {
+    display: flex;
+    gap: .625rem;
+    
+
+    
+    .match-team-section {
+    display: flex;
+    flex-direction: column;
+    border-radius: .625rem;
+    border: .125rem solid #333;
+    flex: 1;
+    overflow: hidden;
+    
+    .match-team-header-section {
+      border-color: #3a96ff;
+      background-color: #3a96ff33;
+      padding: .375rem .625rem;
+      border-bottom: .0625rem solid #666;
+      
+      .match-header-text {
+        color: #3a96ff;
+      }
+    }
+
+    .match-team-body-section {
+      display: flex;
+      flex-direction: column;
+      
+      .match-team-label-list {
+      display: flex;
+
+      .match-team-label-item {
+        text-align: start;
+        flex: 1.5;
+        padding: .375rem .625rem;
+        border-bottom: .0625rem solid #333;
+        
+        .match-team-label-text {
+          font-size: .75rem;
+          color: #aaa;
+        }
+      }
+
+      .match-team-list {
+        list-style-type: none;
+
+        .btn-search-player {
+          display: flex;
+          transition: background-color .2s ease;
+          text-decoration: none;
+          
+          .match-team-item {
+            display: flex;
+            align-items: center;
+            text-align: start;
+            gap: .25rem;
+            flex: 1.5;
+            padding: .375rem .625rem;
+            border-bottom: .0625rem solid #333;
+
+            .img-grade {
+              width: 1.25rem;
+              height: 1.25rem;
+            }
+
+            .match-team-text {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              font-size: .9375rem;
+              color: #eaeaea;
+            }
+          }
+        }
+      }
+     }
+    }
+  }
+}
+}
+}
