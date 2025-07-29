@@ -1,5 +1,5 @@
-window.addEventListener("DOMContentLoaded", function() {
-  const tl = gsap.timeline({})
+window.addEventListener("DOMContentLoaded", function () {
+  const tl = gsap.timeline({});
 
   tl.from(".team-member", {
     opacity: 0,
@@ -7,5 +7,5 @@ window.addEventListener("DOMContentLoaded", function() {
     ease: "power2.out",
     x: -100,
     stagger: 0.2,
-  })
-})
+  });
+});
