@@ -1,11 +1,11 @@
-window.addEventListener("DOMContentLoaded", function() {
+window.addEventListener("DOMContentLoaded", function () {
   const tl = gsap.timeline({
     defaults: {
       opacity: 0,
       duration: 1,
       ease: "power2.out",
     },
-  })
+  });
 
   tl.from(".main-visual__bg", {
     scale: 1.5,
@@ -31,5 +31,5 @@ window.addEventListener("DOMContentLoaded", function() {
         y: 50,
       },
       "-=0.7"
-    )
-})
+    );
+});

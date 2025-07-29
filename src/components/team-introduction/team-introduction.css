@@ -46,7 +46,9 @@
         border-radius: 5000px;
         background-size: cover;
         background-position: center;
-        transition: background-image 0.3s, transform 0.3s;
+        transition:
+          background-image 0.3s,
+          transform 0.3s;
 
         &.member-img01 {
           background-image: url("/public/images/member-01.png");
