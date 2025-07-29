@@ -1,26 +1,34 @@
-import { defineConfig } from 'vite';
-import { resolve } from 'path';
+import { defineConfig } from "vite";
+import { resolve } from "path";
 
 export default defineConfig({
-  base: './', 
+  base: "./",
 
   build: {
-    outDir: 'dist', 
+    outDir: "dist",
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'), 
+        main: resolve(__dirname, "index.html"),
       },
     },
   },
 
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'), 
+      "@": resolve(__dirname, "src"),
     },
   },
 
   server: {
-    port: 3000, 
-    open: true, 
+    port: 3000,
+    open: true,
+    proxy: {
+      "/api/chzzk": {
+        target: "https://openapi.chzzk.naver.com",
+        changeOrigin: true,
+        rewrite: function(path) { return path.replace(/^\/api\/chzzk/, "/open/v1"); },
+        secure: false,
+      },
+    },
   },
 });

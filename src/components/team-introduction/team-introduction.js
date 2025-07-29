@@ -1,4 +1,4 @@
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", function() {
   const tl = gsap.timeline({})
 
   tl.from(".team-member", {
