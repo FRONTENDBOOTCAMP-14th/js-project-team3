@@ -1,42 +1,4 @@
-<!DOCTYPE html>
-<html lang="ko_KR">
-  <head>
-  <meta charset="UTF-8">
-  <link rel="icon" href="/favicon.ico">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Primary Meta Tags -->
-  <title>EZ SCOPE - 서든어택 전적 검색</title>
-  <meta name="title" content="EZ SCOPE - 서든어택 전적 검색">
-  <meta name="description" content="서든어택 전적 검색의 새로운 기준 EZ SCOPE. 최근 전적, KD, 랭크 정보를 한눈에 확인하세요.">
-  <meta name="keywords" content="EZ SCOPE, 이지스코프, 서든, 서든어택, 서든 전적, 서든 전적 검색, 서든 전적 조회">
-  <meta name="author" content="EZ SCOPE">
-  <meta name="robots" content="index, follow, max-image-preview:large">
-  <meta name="language" content="Korean">
-  <meta name="theme-color" content="#000000">
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="EZ SCOPE - 서든어택 전적 검색">
-  <meta property="og:description" content="서든어택 전적 검색의 새로운 기준 EZ SCOPE. 최근 전적, KD, 랭크 정보를 한눈에 확인하세요.">
-  <meta property="og:site_name" content="EZ SCOPE">
-  <meta property="og:locale" content="ko_KR">
-
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="EZ SCOPE - 서든어택 전적 검색">
-  <meta name="twitter:description" content="서든어택 전적 검색의 새로운 기준 EZ SCOPE. 최근 전적, KD, 랭크 정보를 한눈에 확인하세요.">
-
-  <script src="./main.js"></script>
-  <link href="./main.css" rel="stylesheet" />
-
-  </head>
-  <body>
-    닉네임: <input id="inputNickName" />
-    <button id="buttonUserInfo">ouid호출</button>
-    <br />
-
-    <section class="card-component-wrapper">
+<section class="card-component-wrapper">
       <section class="card-header-section">
         <ul class="match-type-list" id="matchType">
           <li class="match-type-item" data-value=""><button class="btn-match-type active">전체</button></li>
@@ -55,7 +17,7 @@
                 <div class="match-type-box">
                   <!-- match-result, match-type-text, match-date-text -->
                 </div>
-                <div class="match-map-box match-map-box-web">
+                <div class="match-map-box">
                   <!-- match-map-text -->
                 </div>
                 <section class="match-stats-section grid-full-width-section">
@@ -69,27 +31,27 @@
                   <div class="match-stats-box">
                     <p class="match-stats-label-text">
                       <img class="icon-stat" src="./src/assets/user_icon/user_score.svg" alt="" />
-                      킬
+                      KDA
                     </p>
                     <!-- kill, death, assist -->
                   </div>
                   <div class="match-stats-box">
                     <p class="match-stats-label-text">
                       <img class="icon-stat" src="./src/assets/user_icon/user_crits_shot.svg" alt="" />
-                      데스
+                      헤드샷
                     </p>
                     <!-- headshotCount -->
                   </div>
                   <div class="match-stats-box">
                     <p class="match-stats-label-text">
                       <img class="icon-stat" src="./src/assets/user_icon/user_dealing.svg" alt="" />
-                      어시스트
+                      딜량
                     </p>
                     <!-- damageDealt -->
                   </div>             
                 </section>
                 <button class="btn-match-detail grid-full-width-section" type="button">
-                  <!-- 매치 상세 버튼 이미지 -->
+                  <!-- 매치 상세 버튼 -->
                 </button>
               </section>
             </section>
@@ -98,6 +60,7 @@
                 <p class="match-result-text"></p>
                 <p class="match-type-text"></p>
                 <p class="match-date-text"></p>
+                <button class="btn-mode-change">최근 동향 조회</button>
               </section>
               <section class="match-detail-section">
                 <section class="match-team-section win">
@@ -136,7 +99,7 @@
                 </section>
                 <section class="match-team-section lose">
                   <section class="match-team-header-section lose">
-                    <p class="match-header-text lose">승리</p>
+                    <p class="match-header-text lose">패배</p>
                   </section>
                   <section class="match-team-body-section">
                     <ul class="match-team-label-list">
@@ -174,9 +137,3 @@
         </ul>
       </section>
     </section>
-
-    <div id="informationArea">
-
-    </div>
-  </body>
-</html>
