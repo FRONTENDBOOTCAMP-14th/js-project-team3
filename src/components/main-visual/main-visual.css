@@ -8,7 +8,7 @@
   .main-visual__bg {
     position: absolute;
     inset: 0;
-    background-image: url("/public/images/visual.png"); /* 원하는 메인 배경 이미지 */
+    background-image: url("/images/visual.png"); /* 원하는 메인 배경 이미지 */
     background-size: cover;
     background-position: center;
   }
@@ -41,7 +41,7 @@
     }
 
     .main-visual__bg {
-      background-image: url("/public/images/visual-mobile.png"); /* 🔥 모바일용 배경 */
+      background-image: url("/images/visual-mobile.png"); /* 🔥 모바일용 배경 */
     }
 
     .visual-img01 {
