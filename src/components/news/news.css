@@ -2,6 +2,7 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
+  margin-top: 50px;
 
   @media (max-width: 1024px) {
     flex-direction: column;
@@ -9,7 +10,7 @@
 }
 
 .news-box {
-  width: 47.5%;
+  width: 49%;
   height: 500px;
   border-radius: 10px;
   border: solid 2px var(--lightgray-color);
@@ -165,6 +166,7 @@
   border-radius: 10px;
   border: solid 2px var(--lightgray-color);
   margin-top: 25px;
+  margin-bottom: 50px;
   width: 100%;
 }
 

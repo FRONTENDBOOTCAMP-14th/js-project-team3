@@ -46,34 +46,36 @@
         border-radius: 5000px;
         background-size: cover;
         background-position: center;
-        transition: background-image 0.3s, transform 0.3s;
+        transition:
+          background-image 0.3s,
+          transform 0.3s;
 
         &.member-img01 {
-          background-image: url("/public/images/member-01.png");
+          background-image: url("/images/member-01.png");
 
           &:hover {
-            background-image: url("/public/images/member-01-over.png");
+            background-image: url("/images/member-01-over.png");
             transform: scale(1.01) rotate(-0.5deg);
           }
         }
         &.member-img02 {
-          background-image: url("/public/images/member-02.png");
+          background-image: url("/images/member-02.png");
           &:hover {
-            background-image: url("/public/images/member-02-over.png");
+            background-image: url("/images/member-02-over.png");
             transform: scale(1.01) rotate(-0.5deg);
           }
         }
         &.member-img03 {
-          background-image: url("/public/images/member-03.png");
+          background-image: url("/images/member-03.png");
           &:hover {
-            background-image: url("/public/images/member-03-over.png");
+            background-image: url("/images/member-03-over.png");
             transform: scale(1.01) rotate(-0.5deg);
           }
         }
         &.member-img04 {
-          background-image: url("/public/images/member-04.png");
+          background-image: url("/images/member-04.png");
           &:hover {
-            background-image: url("/public/images/member-04-over.png");
+            background-image: url("/images/member-04-over.png");
             transform: scale(1.01) rotate(-0.5deg);
           }
         }
