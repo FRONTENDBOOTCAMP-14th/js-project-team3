@@ -38,41 +38,20 @@ header {
         cursor: pointer;
       }
     }
-    /* @media (max-width: 90rem) {
-      &.container {
-        width: 90%;
-      }
-
-      .heade-nav__list {
-        gap: 2.5rem;
-      }
-    } */
   }
 
   /* 반응형 */
-  @media (max-width: 30rem) {
-    font-size: var(--font-size-XXS);
+  @media (max-width: 480px) {
+    /* font-size: var(--font-size-XXS); */
 
-    .header .heade-nav__list {
+    .header .header-nav__list {
       gap: 1rem;
     }
 
-    .header .heade-logo {
+    .header .header-logo {
       img {
-        width: 7rem;
+        width: 6rem;
       }
     }
-  }
-
-  @media (min-width: 48rem) {
-    font-size: var(--font-size-XS);
-  }
-
-  @media (min-width: 64rem) {
-    font-size: var(--font-size-S);
-  }
-
-  @media (min-width: 80rem) {
-    font-size: var(--font-size-M);
   }
 }
