@@ -5,7 +5,8 @@
     background-color: var(--lightgray-color);
     display: flex;
     align-items: center;
-    margin: 25px 0;
+    margin-top: 50px;
+    margin-bottom: 25px;
 }
 
 .live-title-box__chzzk {
@@ -181,4 +182,8 @@
     height: 250px;
     justify-content: center;
     align-items: center;
+}
+
+.footer-margin {
+    margin-bottom: 50px;
 }

@@ -2,6 +2,7 @@ import { renderHeader } from "./components/header/header.js";
 import { renderFooter } from "./components/footer/footer.js";
 import { renderNewsPage } from "./components/news/news.js";
 import { renderLivePage } from "./components/live/live.js";
+import { renderHomePage } from "./components/home/home.js";
 
 function getHeaderElement() {
   return document.getElementById("header");
@@ -17,7 +18,9 @@ function getFooterElement() {
 
 export async function routeTo(page) {
   const main = getMainElement();
-  if (page === "news") {
+  if (page === "home" || page === "") {
+    await renderHomePage(main);
+  } else if (page === "news") {
     await renderNewsPage(main);
   } else if (page === "live") {
     await renderLivePage(main);
@@ -28,7 +31,7 @@ export async function routeTo(page) {
 
 export async function initApp() {
   await renderHeader(getHeaderElement());
-  await routeTo("news");
+  await routeTo("home");
   await renderFooter(getFooterElement());
   window.routeTo = routeTo;
 }
