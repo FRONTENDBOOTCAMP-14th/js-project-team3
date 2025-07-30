@@ -3,6 +3,7 @@ import { renderFooter } from "./components/footer/footer.js";
 import { renderNewsPage } from "./components/news/news.js";
 import { renderLivePage } from "./components/live/live.js";
 import { renderHomePage } from "./components/home/home.js";
+import { renderRecordPage } from "./components/record/record.js";
 
 function getHeaderElement() {
   return document.getElementById("header");
@@ -24,6 +25,8 @@ export async function routeTo(page) {
     await renderNewsPage(main);
   } else if (page === "live") {
     await renderLivePage(main);
+  } else if (page === "record") {
+    await renderRecordPage(main);
   } else {
     main.innerHTML = "<h1>404 Not Found</h1>";
   }

@@ -14,6 +14,26 @@ let OUID = null;
 const RESULT_KEY_VALUE = { 1: "승리", 2: "패배", 3: "무승부", DEFAULT: "-" };
 let MATCH_DETAIL_ID = "";
 
+function extractBodyContent(html) {
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html;
+    const bodyElement = tempDiv.querySelector("body");
+    return bodyElement ? bodyElement.innerHTML : html;
+}
+
+export async function renderScoreDetail(targetElement) {
+    if (!targetElement) return;
+    
+    const html = await fetch("src/components/score-detail/score-detail.html").then(function(res) { 
+        return res.text(); 
+    });
+    
+    const bodyContent = extractBodyContent(html);
+    targetElement.innerHTML = bodyContent;
+    
+    init();
+}
+
 function getTimeAgo(dateMatchString) {
   const matchDate = new Date(dateMatchString);
   const now = new Date();
