@@ -18,18 +18,12 @@ export default defineConfig({
   },
 
   css: {
-    postcss: {
-      plugins: [],
-    },
-    modules: {
-      localsConvention: 'camelCase',
-    },
+    postcss: false,
   },
 
   resolve: {
     alias: {
       "@": resolve(__dirname, "src"),
-      crypto: 'crypto-browserify',
     },
   },
 
