@@ -11,6 +11,13 @@ export default defineConfig({
         main: resolve(__dirname, "index.html"),
       },
     },
+    cssCodeSplit: false,
+  },
+
+  css: {
+    postcss: {
+      plugins: [],
+    },
   },
 
   resolve: {
