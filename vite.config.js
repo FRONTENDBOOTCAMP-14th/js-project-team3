@@ -19,6 +19,12 @@ export default defineConfig({
 
   css: {
     postcss: false,
+    modules: false,
+    preprocessorOptions: {
+      css: {
+        additionalData: '',
+      },
+    },
   },
 
   resolve: {
@@ -41,11 +47,13 @@ export default defineConfig({
   },
 
   optimizeDeps: {
-    exclude: ['crypto'],
+    exclude: ['crypto', 'postcss'],
   },
 
   define: {
     global: 'globalThis',
     'process.env': {},
   },
+
+  plugins: [],
 });
