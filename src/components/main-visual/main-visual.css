@@ -7,7 +7,10 @@
 
   .main-visual__bg {
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background-image: url("/images/visual.png"); /* 원하는 메인 배경 이미지 */
     background-size: cover;
     background-position: center;
@@ -16,13 +19,13 @@
   .visual-img01 {
     width: 18.5rem;
     display: block;
-    margin-block-end: 1.25rem;
+    margin-bottom: 1.25rem;
   }
 
   .visual-img02 {
     width: 35rem;
     display: block;
-    margin-block-end: 1.25rem;
+    margin-bottom: 1.25rem;
   }
 
   .visual-text {
