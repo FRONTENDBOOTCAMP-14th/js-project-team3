@@ -80,7 +80,7 @@ const mockUserInfo = {
 export function UserInfo(targetElement, props) {
   // --- 상태 영역 ---
   let state = {
-    activeTab: "total", // 'total' or 'season'
+    activeTab: "total", // "total" or "season"
   };
 
   // --- 메서드 영역 ---

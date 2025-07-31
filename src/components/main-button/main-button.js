@@ -1,7 +1,7 @@
 function extractBodyContent(html) {
-    const tempDiv = document.createElement('div');
+    const tempDiv = document.createElement("div");
     tempDiv.innerHTML = html;
-    const bodyElement = tempDiv.querySelector('body');
+    const bodyElement = tempDiv.querySelector("body");
     return bodyElement ? bodyElement.innerHTML : html;
 }
 

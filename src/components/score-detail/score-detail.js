@@ -1,15 +1,6 @@
-const API_KEY = import.meta.env.VITE_NEXON_OPEN_API_KEY1;
-const API_KEY_LIST = [
-  import.meta.env.VITE_NEXON_OPEN_API_KEY1,
-  import.meta.env.VITE_NEXON_OPEN_API_KEY2,
-  import.meta.env.VITE_NEXON_OPEN_API_KEY3,
-  import.meta.env.VITE_NEXON_OPEN_API_KEY4,
-];
-
 const detailArrayMap = {};
 
 const MATCH_MODE = "폭파미션";
-const DOMAIN = "https://open.api.nexon.com/suddenattack/v1";
 let OUID = null;
 const RESULT_KEY_VALUE = { 1: "승리", 2: "패배", 3: "무승부", DEFAULT: "-" };
 let MATCH_DETAIL_ID = "";
@@ -262,26 +253,29 @@ const init = () => {
   const matchHistoryListUl = document.querySelector(".match-history-list");
   const informationArea = document.getElementById("informationArea");
 
-  // 닉네임으로 ouid 받아오기
+  // DOM 요소 존재 확인
+  if (!buttonUserInfo) {
+    console.warn("[SCORE-DETAIL] buttonUserInfo 요소를 찾을 수 없습니다.");
+    return;
+  }
+
+  // 닉네임으로 ouid 받아오기 - 서버리스 함수를 통해 호출
   buttonUserInfo.addEventListener("click", () => {
     const userName = inputNickName.value.trim();
-    const params = new URLSearchParams();
-    params.set("user_name", userName);
-    const ouidcallUrl = `${DOMAIN}/id?${params.toString()}`;
-
-    fetch(ouidcallUrl, {
+    
+    fetch(`/.netlify/functions/get-ouid?nickname=${encodeURIComponent(userName)}`, {
       method: "GET",
-      headers: {
-        accept: "application/json",
-        "x-nxopen-api-key": API_KEY,
-      },
     })
       .then((response) => response.json())
       .then((data) => {
-        OUID = data.ouid;
-        ouidArea.innerHTML = `${userName}의 ouid -> ${OUID}`;
-        matchHistoryListUl.innerHTML = "";
-        informationArea.innerHTML = "";
+        if (data.success && data.data.ouid) {
+          OUID = data.data.ouid;
+          ouidArea.innerHTML = `${userName}의 ouid -> ${OUID}`;
+          matchHistoryListUl.innerHTML = "";
+          informationArea.innerHTML = "";
+        } else {
+          ouidArea.innerHTML = "사용자를 찾을 수 없습니다.";
+        }
       });
   });
 
@@ -300,35 +294,26 @@ const init = () => {
 
           matchHistoryListUl.innerHTML = "";
           informationArea.innerHTML =
-            '<p class="match-loading">매치 정보를 로딩 중입니다...</p>';
+            "<p class=\"match-loading\">매치 정보를 로딩 중입니다...</p>";
 
+          //매치 목록 1차 요청 - 서버리스 함수를 통해 호출
           const params = new URLSearchParams();
           params.set("ouid", OUID);
           params.set("match_mode", MATCH_MODE);
-          if (matchTypeText) {
-            params.set("match_type", matchTypeText);
-          }
-          const matchListCallUrl = `${DOMAIN}/match?${params.toString()}`;
-
-          //매치 목록 1차 요청
-          fetch(matchListCallUrl, {
+          if (matchTypeText) params.set("match_type", matchTypeText);
+          
+          fetch(`/.netlify/functions/get-match-list?${params.toString()}`, {
             method: "GET",
-            headers: {
-              accept: "application/json",
-              "x-nxopen-api-key": API_KEY,
-            },
           })
             .then((response) => response.json())
             .then((matchdata) => {
               // 1차요청의 패치를 성공!
 
-              const matchList = matchdata.match
-                ? matchdata.match.slice(0, 9)
-                : [];
+              const matchList = matchdata.success ? (matchdata.data.match ? matchdata.data.match.slice(0, 9) : []) : [];
 
-              if (!matchdata.match || matchdata.match.length === 0) {
+              if (!matchdata.success || !matchdata.data.match || matchdata.data.match.length === 0) {
                 matchHistoryListUl.innerHTML =
-                  '<li class="match-history-item"><p>해당 조건의 매치 결과가 없습니다.</p></li>';
+                  "<li class=\"match-history-item\"><p>해당 조건의 매치 결과가 없습니다.</p></li>";
                 return;
               }
 
@@ -336,20 +321,15 @@ const init = () => {
                 const li = renderMatchItem(item);
                 matchHistoryListUl.appendChild(li);
 
-                const arrayIndex = index % API_KEY_LIST.length;
-                let apiKey = API_KEY_LIST[arrayIndex];
-
-                // 2차 요청
-                const matchDetailCallUrl = `${DOMAIN}/match-detail?match_id=${item["match_id"]}`;
-                fetch(matchDetailCallUrl, {
+                // 2차 요청 - 서버리스 함수를 통해 호출
+                fetch(`/.netlify/functions/get-match-detail?match_id=${item["match_id"]}`, {
                   method: "GET",
-                  headers: {
-                    accept: "application/json",
-                    "x-nxopen-api-key": apiKey,
-                  },
                 })
                   .then((response) => response.json())
                   .then((matchDetaildata) => {
+                    if (!matchDetaildata.success) return;
+                    
+                    const matchDetail = matchDetaildata.data;
                     const section = document.querySelector(
                       `section[data-match-id="${item["match_id"]}"`
                     );
@@ -359,11 +339,11 @@ const init = () => {
                     );
 
                     section.querySelector(".match-map-text").innerHTML =
-                      matchDetaildata["match_map"];
+                      matchDetail["match_map"];
                     sectionDetailElement.querySelector(".map-name").innerHTML =
-                      matchDetaildata["match_map"];
+                      matchDetail["match_map"];
 
-                    const detailArray = matchDetaildata["match_detail"];
+                    const detailArray = matchDetail["match_detail"];
                     if (detailArray) {
                       const myName =
                         document.getElementById("inputNickName").value;

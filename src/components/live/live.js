@@ -223,7 +223,7 @@ async function initializeLiveList() {
             console.warn("유튜브 서든어택 라이브를 찾을 수 없습니다.");
             youtubeLiveContainer.innerHTML = `
                 <div class="live-status-wrapper">
-                    <p>현재 유튜브에서 '서든어택' 라이브를 찾을 수 없습니다.</p>
+                    <p>현재 유튜브에서 "서든어택" 라이브를 찾을 수 없습니다.</p>
                 </div>`;
         }
     } else {

@@ -12,16 +12,16 @@ export function OtherInfo(props) {
   // HTML 문자열을 직접 반환합니다.
   const render = () => {
     const { info } = props;
-    if (!info) return ''; // 데이터가 없으면 빈 문자열 반환
+    if (!info) return ""; // 데이터가 없으면 빈 문자열 반환
 
     return `
     <div class="clan-profile">
       <div class="clan-profile__header">
         <h2 class="clan-profile__title">${info.title}</h2>
         ${
-          info.title !== '클랜전'
+          info.title !== "클랜전"
             ? `<div class="clan-profile__subtitle">2025년 시즌3</div>`
-            : ''
+            : ""
         }
       </div>
       <div class="clan-profile__body">

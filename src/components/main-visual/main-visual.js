@@ -2,9 +2,9 @@
 /* global gsap */
 
 function extractBodyContent(html) {
-    const tempDiv = document.createElement('div');
+    const tempDiv = document.createElement("div");
     tempDiv.innerHTML = html;
-    const bodyElement = tempDiv.querySelector('body');
+    const bodyElement = tempDiv.querySelector("body");
     return bodyElement ? bodyElement.innerHTML : html;
 }
 
@@ -18,7 +18,7 @@ export async function renderMainVisual(targetElement) {
     const bodyContent = extractBodyContent(html);
     targetElement.innerHTML = bodyContent;
     
-    if (typeof gsap !== 'undefined') {
+    if (typeof gsap !== "undefined") {
         const tl = gsap.timeline({
             defaults: {
                 opacity: 0,
@@ -56,7 +56,7 @@ export async function renderMainVisual(targetElement) {
 }
 
 window.addEventListener("DOMContentLoaded", function () {
-    if (typeof gsap !== 'undefined') {
+    if (typeof gsap !== "undefined") {
         const tl = gsap.timeline({
             defaults: {
                 opacity: 0,

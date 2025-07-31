@@ -19,12 +19,16 @@ export async function renderSearchBar(targetElement) {
     const searchInput = targetElement.querySelector(".search-form__input");
     const previousSearchList = targetElement.querySelector(".previous-search-list");
     
-    if (searchForm) {
+    if (searchForm && searchInput) {
         searchForm.addEventListener("submit", function(e) {
             e.preventDefault();
             const searchTerm = searchInput.value.trim();
             if (searchTerm) {
-                console.log("검색어:", searchTerm);
+                console.log(`[SEARCHBAR] 검색어: ${searchTerm}`);
+                // URL 업데이트 및 검색 실행
+                if (window.routeTo) {
+                    window.routeTo('score', { nickname: searchTerm });
+                }
             }
         });
     }
