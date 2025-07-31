@@ -10,6 +10,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, "index.html"),
       },
+      external: ['crypto'],
     },
     cssCodeSplit: false,
     minify: 'esbuild',
@@ -28,6 +29,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "src"),
+      crypto: 'crypto-browserify',
     },
   },
 
@@ -50,5 +52,6 @@ export default defineConfig({
 
   define: {
     global: 'globalThis',
+    'process.env': {},
   },
 });
