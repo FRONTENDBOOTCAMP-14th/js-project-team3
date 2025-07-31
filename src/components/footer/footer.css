@@ -2,26 +2,25 @@ footer {
   background-color: var(--deepgray-color);
   text-align: center;
   padding: 3.75rem 0;
+}
 
-  .footer-txt {
-    margin-bottom: 1rem;
-    h2 {
-      font-size: 1rem;
-      font-weight: 400;
-      line-height: 1.5;
+.footer-txt {
+  margin-bottom: 1rem;
+}
 
-      span {
-        display: block;
-        font-weight: 900;
-      }
-    }
-  }
+.footer-txt h2 {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
 
-  .footer-copyright {
-    p {
-      font-size: 0.875rem;
-      font-weight: 400;
-      color: var(--line-color);
-    }
-  }
+.footer-txt h2 span {
+  display: block;
+  font-weight: 900;
+}
+
+.footer-copyright p {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--line-color);
 }

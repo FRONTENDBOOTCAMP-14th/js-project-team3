@@ -9,7 +9,6 @@
   padding: 0.25rem 0.5rem;
   width: 100%;
   height: 100%;
-
   position: relative;
   background: linear-gradient(
     135deg,
@@ -21,92 +20,92 @@
     #222,
     #1a1a1a
   );
+}
 
-  @media (min-width: 480px) {
-    grid-column:auto
+@media (min-width: 480px) {
+  .clan-profile {
+    grid-column: auto;
   }
+}
 
-  .clan-profile__header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
+.clan-profile__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
 
-    .clan-profile__title {
-      font-size: 1rem;
-    }
+.clan-profile__title {
+  font-size: 1rem;
+}
 
-    .clan-profile__subtitle {
-      font-size: 11px;
-      color: var(--sub-font-color);
-    }
-  }
+.clan-profile__subtitle {
+  font-size: 11px;
+  color: var(--sub-font-color);
+}
 
-  
+.clan-profile__body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  border-radius: 0.625rem;
+  margin: 0.5rem;
+}
 
-  .clan-profile__body {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    border-radius: 0.625rem;
-    margin: 0.5rem;
+.clan-profile__emblem {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-    .clan-profile__emblem {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+.clan-profile__emblem__img {
+  width: 80%;
+  max-width: 6.25rem;
+}
 
-      .clan-profile__emblem__img {
-        width: 80%;
-        max-width: 6.25rem;
-      }
-    }
+.clan-profile__name {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
 
-    .clan-profile__name {
-      font-size: 0.8rem;
-      font-weight: 500;
-    }
+.clan-profile__stats {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding-inline: 0.5rem;
+  gap: 1rem;
+}
 
-    .clan-profile__stats {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      padding-inline: 0.5rem;
-      gap: 1rem;
+.stat-item {
+  width: 100%;
+  font-size: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-      .stat-item {
-        width: 100%;
-        font-size: 0.8rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+.stat-item__label {
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
 
-        .stat-item__label {
-          font-size: 0.7rem;
-          display: flex;
-          align-items: center;
-          gap: 5px;
+.stat-item__label img {
+  width: 1rem;
+  height: 1rem;
+}
 
-          img {
-            width: 1rem;
-            height: 1rem;
-          }
-        }
-
-        .stat-item__value {
-          font-weight: 500;
-        }
-      }
-    }
-  }
+.stat-item__value {
+  font-weight: 500;
 }
 
 .clan-profile::after {

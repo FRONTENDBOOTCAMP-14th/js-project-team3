@@ -3,12 +3,17 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
+}
 
-  @media (min-width: 768px) {
+@media (min-width: 768px) {
+  .user-info {
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
   }
-  @media (min-width: 1440px) {
+}
+
+@media (min-width: 1440px) {
+  .user-info {
     grid-template-columns: 2fr repeat(3, 1fr);
     gap: 18px;
   }
@@ -16,15 +21,18 @@
 
 .user-profile-container {
   grid-column: 1 / -1;
+}
 
-  @media (min-width: 768px) {
+@media (min-width: 768px) {
+  .user-profile-container {
     grid-column: 1 / -1;
     max-width: 35rem;
   }
+}
 
-  @media (min-width: 1440px) {
+@media (min-width: 1440px) {
+  .user-profile-container {
     grid-column: 1 / 2;
-    
   }
 }
 
