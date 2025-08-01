@@ -44,12 +44,31 @@ exports.handler = async function(event, context) {
 
         // API 키 로테이션
         const apiKeys = [
-            process.env.NEXON_OPEN_API_KEY1,
-            process.env.NEXON_OPEN_API_KEY2,
-            process.env.NEXON_OPEN_API_KEY3,
-            process.env.NEXON_OPEN_API_KEY4
+            process.env.VITE_NEXON_OPEN_API_KEY1 || process.env.NEXON_OPEN_API_KEY1,
+            process.env.VITE_NEXON_OPEN_API_KEY2 || process.env.NEXON_OPEN_API_KEY2,
+            process.env.VITE_NEXON_OPEN_API_KEY3 || process.env.NEXON_OPEN_API_KEY3,
+            process.env.VITE_NEXON_OPEN_API_KEY4 || process.env.NEXON_OPEN_API_KEY4
         ];
+        
+        console.log(`[OUID] 환경변수 확인 - API Key 1: ${apiKeys[0] ? '설정됨' : '설정되지 않음'}`);
+        console.log(`[OUID] 환경변수 확인 - API Key 2: ${apiKeys[1] ? '설정됨' : '설정되지 않음'}`);
+        console.log(`[OUID] 환경변수 확인 - API Key 3: ${apiKeys[2] ? '설정됨' : '설정되지 않음'}`);
+        console.log(`[OUID] 환경변수 확인 - API Key 4: ${apiKeys[3] ? '설정됨' : '설정되지 않음'}`);
+        console.log(`[OUID] 사용 가능한 환경변수:`, Object.keys(process.env).filter(key => key.includes('NEXON')));
+        
         const selectedApiKey = apiKeys[Math.floor(Math.random() * apiKeys.length)];
+        
+        if (!selectedApiKey) {
+            console.error(`[OUID] 모든 API 키가 설정되지 않음`);
+            return {
+                statusCode: 500,
+                headers: headers,
+                body: JSON.stringify({
+                    success: false,
+                    error: "API keys not configured"
+                })
+            };
+        }
 
         // 서든어택 API 호출
             const url = `https://open.api.nexon.com/suddenattack/v1/id?user_name=${encodeURIComponent(nickname)}`;
@@ -86,12 +105,17 @@ exports.handler = async function(event, context) {
 
     } catch (error) {
         console.error("Error:", error);
+        console.error("Error stack:", error.stack);
+        console.error("Error name:", error.name);
+        console.error("Error message:", error.message);
+        
         return {
             statusCode: 500,
             headers: headers,
             body: JSON.stringify({
                 success: false,
-                error: error.message
+                error: error.message,
+                stack: error.stack
             })
         };
     }

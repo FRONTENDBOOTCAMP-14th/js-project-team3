@@ -44,10 +44,10 @@ exports.handler = async function(event, context) {
 
         // API 키 로테이션
         const apiKeys = [
-            process.env.NEXON_OPEN_API_KEY1,
-            process.env.NEXON_OPEN_API_KEY2,
-            process.env.NEXON_OPEN_API_KEY3,
-            process.env.NEXON_OPEN_API_KEY4
+            process.env.VITE_NEXON_OPEN_API_KEY1 || process.env.NEXON_OPEN_API_KEY1,
+            process.env.VITE_NEXON_OPEN_API_KEY2 || process.env.NEXON_OPEN_API_KEY2,
+            process.env.VITE_NEXON_OPEN_API_KEY3 || process.env.NEXON_OPEN_API_KEY3,
+            process.env.VITE_NEXON_OPEN_API_KEY4 || process.env.NEXON_OPEN_API_KEY4
         ];
         const selectedApiKey = apiKeys[Math.floor(Math.random() * apiKeys.length)];
 

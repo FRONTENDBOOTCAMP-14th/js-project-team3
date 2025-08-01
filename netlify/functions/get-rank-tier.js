@@ -40,20 +40,20 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // API 키 로테이션 (4개 키 중 하나 선택)
+    // API 키 로테이션
     const apiKeys = [
-      process.env.NEXON_OPEN_API_KEY1,
-      process.env.NEXON_OPEN_API_KEY2,
-      process.env.NEXON_OPEN_API_KEY3,
-      process.env.NEXON_OPEN_API_KEY4
+        process.env.VITE_NEXON_OPEN_API_KEY1 || process.env.NEXON_OPEN_API_KEY1,
+        process.env.VITE_NEXON_OPEN_API_KEY2 || process.env.NEXON_OPEN_API_KEY2,
+        process.env.VITE_NEXON_OPEN_API_KEY3 || process.env.NEXON_OPEN_API_KEY3,
+        process.env.VITE_NEXON_OPEN_API_KEY4 || process.env.NEXON_OPEN_API_KEY4
     ];
-    const selectedKey = apiKeys[Math.floor(Math.random() * apiKeys.length)];
+    const selectedApiKey = apiKeys[Math.floor(Math.random() * apiKeys.length)];
 
     // 서든어택 API로 랭크 티어 조회
     const response = await fetch(`https://open.api.nexon.com/suddenattack/v1/user/rank-tier?ouid=${ouid}`, {
       method: "GET",
       headers: {
-        "x-nxopen-api-key": selectedKey
+        "x-nxopen-api-key": selectedApiKey
       }
     });
 
