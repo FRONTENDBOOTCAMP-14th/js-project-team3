@@ -9,12 +9,12 @@
   font-weight: 600;
   line-height: 6.25rem;
   transition: transform 0.1s;
-}
 
-.main-button:hover {
-  transform: scale(1.01);
-}
+  &:hover {
+    transform: scale(1.01);
+  }
 
-.main-button:active {
-  transform: scale(0.99);
+  &:active {
+    transform: scale(0.99);
+  }
 }

@@ -20,7 +20,7 @@ export default defineConfig({
   css: {
     postcss: {
       plugins: [
-        postcssNested,
+        postcssNested(),
       ],
     },
     modules: false,
