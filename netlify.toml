@@ -4,16 +4,10 @@
   command = "npm run build"
 
 [build.environment]
-  NODE_VERSION = "18"
-
-# API 프록시 리다이렉트
-[[redirects]]
-  from = "/.netlify/functions/api-proxy/*"
-  to = "/.netlify/functions/api-proxy/:splat"
-  status = 200
+  NODE_VERSION = "22"
 
 # SPA 리다이렉트
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200 
+  status = 200
