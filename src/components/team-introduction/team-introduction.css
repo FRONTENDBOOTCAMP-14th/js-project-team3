@@ -1,4 +1,4 @@
-/* * {
+* {
   margin: 0;
 }
 
@@ -49,7 +49,9 @@
   border-radius: 5000px;
   background-size: cover;
   background-position: center;
-  transition: background-image 0.3s, transform 0.3s;
+  transition:
+    background-image 0.3s,
+    transform 0.3s;
 }
 
 .member-img01 {
@@ -117,4 +119,4 @@
   .team-intro__members {
     grid-template-columns: 1fr;
   }
-} */
+}

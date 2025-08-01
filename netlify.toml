@@ -4,10 +4,10 @@
   command = "npm run build"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "22"
 
 # SPA 리다이렉트
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200 
+  status = 200
