@@ -41,14 +41,6 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    proxy: {
-      "/api/chzzk": {
-        target: "https://openapi.chzzk.naver.com",
-        changeOrigin: true,
-        rewrite: function(path) { return path.replace(/^\/api\/chzzk/, "/open/v1"); },
-        secure: false,
-      },
-    },
   },
 
   optimizeDeps: {
