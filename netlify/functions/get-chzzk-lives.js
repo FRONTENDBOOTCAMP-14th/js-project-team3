@@ -30,11 +30,12 @@ exports.handler = async function(event, context) {
         const next = event.queryStringParameters?.next;
         
         // 환경변수에서 클라이언트 ID와 시크릿 가져오기
-        const clientId = process.env.VITE_NAVER_CLIENT_ID;
-        const clientSecret = process.env.VITE_NAVER_CLIENT_SECRET;
+        const clientId = process.env.VITE_NAVER_CLIENT_ID || process.env.NAVER_CLIENT_ID;
+        const clientSecret = process.env.VITE_NAVER_CLIENT_SECRET || process.env.NAVER_CLIENT_SECRET;
 
         console.log(`[CHZZK] 환경변수 확인 - ClientId: ${clientId ? '설정됨' : '설정되지 않음'}, ClientSecret: ${clientSecret ? '설정됨' : '설정되지 않음'}`);
         console.log(`[CHZZK] 사용 가능한 환경변수:`, Object.keys(process.env).filter(key => key.includes('NAVER')));
+        console.log(`[CHZZK] 전체 환경변수 키:`, Object.keys(process.env));
 
         if (!clientId || !clientSecret) {
             return {

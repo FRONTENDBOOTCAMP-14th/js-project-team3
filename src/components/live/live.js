@@ -1,7 +1,3 @@
-const CLIENT_ID = import.meta.env.VITE_NAVER_CLIENT_ID;
-const CLIENT_SECRET = import.meta.env.VITE_NAVER_CLIENT_SECRET;
-const YOUTUBE_API_KEY = import.meta.env.VITE_YOUTUBE_OPEN_API_KEY;
-
 const THUMBNAIL_TYPES_TO_TRY = ["1080", "720"];
 
 window.tryNextThumbnailType = function(imgElement) {
@@ -23,6 +19,7 @@ window.tryNextThumbnailType = function(imgElement) {
 
 async function fetchLiveList(size = 20, next = null) {
     try {
+        // 치지직 API를 Netlify Functions를 통해 호출
         let url = `/.netlify/functions/get-chzzk-lives?size=${size}`;
         if (next) {
             url += `&next=${next}`;
@@ -58,63 +55,31 @@ async function fetchLiveList(size = 20, next = null) {
 
 async function fetchYoutubeLiveList(query, maxResults = 10) {
     try {
-        const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&eventType=live&key=${YOUTUBE_API_KEY}&maxResults=${maxResults}`;
-        
-        const searchResponse = await fetch(searchUrl);
-        const searchData = await searchResponse.json();
+        // 유튜브 API를 Netlify Functions를 통해 호출
+        const url = `/.netlify/functions/get-youtube-lives?query=${encodeURIComponent(query)}&maxResults=${maxResults}`;
 
-        if (!searchResponse.ok) {
-            throw new Error(`YouTube Search API 요청 실패 : ${searchResponse.status} - ${searchData.error?.message || searchResponse.statusText}`);
-        }
+        const headers = {
+            "Content-Type": "application/json"
+        };
 
-        const videoIds = searchData.items.map(function(item) { return item.id.videoId; }).filter(function(id) { return id; });
-        
-        if (videoIds.length === 0) {
-            return []; 
-        }
-
-        const videoDetailsUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id=${videoIds.join(",")}&key=${YOUTUBE_API_KEY}`;
-        const videoDetailsResponse = await fetch(videoDetailsUrl);
-        const videoDetailsData = await videoDetailsResponse.json();
-
-        if (!videoDetailsResponse.ok) {
-            throw new Error(`YouTube Videos API 요청 실패 : ${videoDetailsResponse.status} - ${videoDetailsData.error?.message || videoDetailsResponse.statusText}`);
-        }
-
-        const channelsToFetch = new Set();
-        videoDetailsData.items.forEach(function(video) {
-            channelsToFetch.add(video.snippet.channelId);
+        const response = await fetch(url, {
+            method: "GET",
+            headers: headers
         });
 
-        const channelIds = Array.from(channelsToFetch).filter(function(id) { return id; });
-        let channelDetails = {};
-        if (channelIds.length > 0) {
-            const channelDetailsUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelIds.join(",")}&key=${YOUTUBE_API_KEY}`;
-            const channelDetailsResponse = await fetch(channelDetailsUrl);
-            const channelDetailsData = await channelDetailsResponse.json();
-
-            if (!channelDetailsResponse.ok) {
-                console.warn(`YouTube Channels API 요청 실패 (채널 이미지) : ${channelDetailsResponse.status} - ${channelDetailsData.error?.message || channelDetailsResponse.statusText}`);
-            } else {
-                channelDetailsData.items.forEach(function(channel) {
-                    channelDetails[channel.id] = channel.snippet.thumbnails.default.url;
-                });
-            }
-        }
+        const data = await response.json();
         
-        return videoDetailsData.items.map(function(video) {
-            return {
-                platform: "youtube", 
-                liveTitle: video.snippet.title,
-                liveThumbnailImageUrl: video.snippet.thumbnails.high?.url || video.snippet.thumbnails.medium?.url || video.snippet.thumbnails.default?.url,
-                channelId: video.snippet.channelId,
-                channelName: video.snippet.channelTitle,
-                channelImageUrl: channelDetails[video.snippet.channelId] || "https://via.placeholder.com/30", 
-                concurrentUserCount: video.liveStreamingDetails?.concurrentViewers || 0, 
-                liveStreamUrl: `https://www.youtube.com/watch?v=${video.id}`
-            };
-        });
+        if (!response.ok) { 
+            throw new Error(`HTTP 요청 실패 : ${response.status} - ${data.error || response.statusText}`);
+        }
 
+        // 서버 응답 구조 확인
+        if (!data.success) {
+            throw new Error(`API 내부 오류 : ${data.error || "알 수 없는 오류"}`);
+        }
+
+        // 서버에서 { success: true, data: ... } 형태로 응답하므로 data.data를 반환
+        return data.data;
     } catch (error) {
         console.error("유튜브 라이브 목록 조회 중 오류 발생 :", error); 
         return null;
