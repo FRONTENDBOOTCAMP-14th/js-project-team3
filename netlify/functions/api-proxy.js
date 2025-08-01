@@ -8,23 +8,23 @@ let keyIndex = 0;
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type, Authorization, Client-Id, Client-Secret",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 };
 
 // API 엔드포인트 매핑
 const API_ENDPOINTS = {
   // Nexon API - 공식 문서 기준 (7개 엔드포인트)
-  'ouid': '/id',
-  'user-basic': '/user/basic',
-  'user-rank': '/user/rank',
-  'user-tier': '/user/tier',
-  'user-recent-info': '/user/recent-info',
-  'match': '/match',
-  'match-detail': '/match-detail',
-  
+  ouid: "/id",
+  "user-basic": "/user/basic",
+  "user-rank": "/user/rank",
+  "user-tier": "/user/tier",
+  "user-recent-info": "/user/recent-info",
+  match: "/match",
+  "match-detail": "/match-detail",
+
   // Live APIs
-  'chzzk-lives': 'chzzk',
-  'youtube-lives': 'youtube'
+  "chzzk-lives": "chzzk",
+  "youtube-lives": "youtube",
 };
 
 // API 키 관리
@@ -35,16 +35,16 @@ class ApiKeyManager {
       process.env.VITE_NEXON_OPEN_API_KEY2 || process.env.NEXON_OPEN_API_KEY2,
       process.env.VITE_NEXON_OPEN_API_KEY3 || process.env.NEXON_OPEN_API_KEY3,
       process.env.VITE_NEXON_OPEN_API_KEY4 || process.env.NEXON_OPEN_API_KEY4,
-    ].filter(key => key && key.trim() !== '');
-    
+    ].filter((key) => key && key.trim() !== "");
+
     this.currentIndex = 0;
   }
 
   getNextKey() {
     if (this.keys.length === 0) {
-      throw new Error('사용 가능한 API 키가 없습니다.');
+      throw new Error("사용 가능한 API 키가 없습니다.");
     }
-    
+
     const key = this.keys[this.currentIndex % this.keys.length];
     this.currentIndex++;
     return key;
@@ -68,9 +68,9 @@ function validateRequest(event) {
   }
 
   if (event.httpMethod !== "GET") {
-    return { 
-      isValid: false, 
-      error: { statusCode: 405, message: "Method not allowed" }
+    return {
+      isValid: false,
+      error: { statusCode: 405, message: "Method not allowed" },
     };
   }
 
@@ -83,30 +83,30 @@ function validateRequest(event) {
     // Netlify Functions v1
     path = event.path.replace("/.netlify/functions/api-proxy/", "");
   }
-  
+
   console.log("파싱된 경로:", path);
-  
+
   // 빈 경로 처리
   if (!path || path === "/") {
-    return { 
-      isValid: false, 
-      error: { statusCode: 400, message: "Endpoint not specified" }
+    return {
+      isValid: false,
+      error: { statusCode: 400, message: "Endpoint not specified" },
     };
   }
-  
+
   // 앞의 슬래시 제거
   path = path.replace(/^\/+/, "");
   console.log("정리된 경로:", path);
-  
-  const endpoint = path.split('/')[0];
+
+  const endpoint = path.split("/")[0];
   console.log("엔드포인트:", endpoint);
-  
+
   if (!API_ENDPOINTS[endpoint]) {
     console.error("알 수 없는 엔드포인트:", endpoint);
     console.error("사용 가능한 엔드포인트:", Object.keys(API_ENDPOINTS));
-    return { 
-      isValid: false, 
-      error: { statusCode: 404, message: "Endpoint not found" }
+    return {
+      isValid: false,
+      error: { statusCode: 404, message: "Endpoint not found" },
     };
   }
 
@@ -117,12 +117,12 @@ function validateRequest(event) {
 function buildNexonApiUrl(endpoint, queryParams) {
   const baseUrl = process.env.VITE_NEXON_OPEN_API_URL || "https://open.api.nexon.com/suddenattack/v1";
   const apiPath = API_ENDPOINTS[endpoint];
-  
+
   if (!apiPath) {
     throw new Error(`Unknown endpoint: ${endpoint}`);
   }
 
-  const queryString = queryParams ? `?${queryParams}` : '';
+  const queryString = queryParams ? `?${queryParams}` : "";
   return `${baseUrl}${apiPath}${queryString}`;
 }
 
@@ -132,9 +132,9 @@ async function callNexonApi(url, apiKey) {
     method: "GET",
     headers: {
       "x-nxopen-api-key": apiKey,
-      "Accept": "application/json",
-      "Content-Type": "application/json"
-    }
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
   });
 
   if (!response.ok) {
@@ -156,7 +156,7 @@ async function callChzzkApi(params) {
 
   const size = params.size || 20;
   const next = params.next;
-  
+
   let url = `https://api.chzzk.naver.com/service/v1/lives?size=${size}`;
   if (next) {
     url += `&next=${next}`;
@@ -164,20 +164,20 @@ async function callChzzkApi(params) {
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 5000);
-  
+
   try {
     const response = await fetch(url, {
       method: "GET",
       headers: {
         "Client-Id": clientId,
         "Client-Secret": clientSecret,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      signal: controller.signal
+      signal: controller.signal,
     });
-    
+
     clearTimeout(timeoutId);
-    
+
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
@@ -186,11 +186,11 @@ async function callChzzkApi(params) {
     return await response.json();
   } catch (error) {
     clearTimeout(timeoutId);
-    
-    if (error.name === 'AbortError') {
+
+    if (error.name === "AbortError") {
       throw new Error("API request timeout");
     }
-    
+
     throw error;
   }
 }
@@ -208,7 +208,7 @@ async function callYoutubeApi(params) {
 
   // YouTube Search API 호출
   const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&eventType=live&key=${youtubeApiKey}&maxResults=${maxResults}`;
-  
+
   const searchResponse = await fetch(searchUrl);
   const searchData = await searchResponse.json();
 
@@ -216,15 +216,15 @@ async function callYoutubeApi(params) {
     throw new Error(`YouTube Search API error: ${searchResponse.status}`);
   }
 
-  const videoIds = searchData.items.map(item => item.id.videoId).filter(id => id);
-  
+  const videoIds = searchData.items.map((item) => item.id.videoId).filter((id) => id);
+
   if (videoIds.length === 0) {
     return [];
   }
 
   // YouTube Videos API 호출
   const videoDetailsUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id=${videoIds.join(",")}&key=${youtubeApiKey}`;
-  
+
   const videoDetailsResponse = await fetch(videoDetailsUrl);
   const videoDetailsData = await videoDetailsResponse.json();
 
@@ -234,36 +234,39 @@ async function callYoutubeApi(params) {
 
   // 채널 정보 가져오기
   const channelsToFetch = new Set();
-  videoDetailsData.items.forEach(video => {
+  videoDetailsData.items.forEach((video) => {
     channelsToFetch.add(video.snippet.channelId);
   });
 
-  const channelIds = Array.from(channelsToFetch).filter(id => id);
+  const channelIds = Array.from(channelsToFetch).filter((id) => id);
   let channelDetails = {};
-  
+
   if (channelIds.length > 0) {
     const channelDetailsUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelIds.join(",")}&key=${youtubeApiKey}`;
-    
+
     const channelDetailsResponse = await fetch(channelDetailsUrl);
     const channelDetailsData = await channelDetailsResponse.json();
 
     if (channelDetailsResponse.ok) {
-      channelDetailsData.items.forEach(channel => {
+      channelDetailsData.items.forEach((channel) => {
         channelDetails[channel.id] = channel.snippet.thumbnails.default.url;
       });
     }
   }
-  
+
   // 응답 데이터 구성
-  return videoDetailsData.items.map(video => ({
-    platform: "youtube", 
+  return videoDetailsData.items.map((video) => ({
+    platform: "youtube",
     liveTitle: video.snippet.title,
-    liveThumbnailImageUrl: video.snippet.thumbnails.high?.url || video.snippet.thumbnails.medium?.url || video.snippet.thumbnails.default?.url,
+    liveThumbnailImageUrl:
+      video.snippet.thumbnails.high?.url ||
+      video.snippet.thumbnails.medium?.url ||
+      video.snippet.thumbnails.default?.url,
     channelId: video.snippet.channelId,
     channelName: video.snippet.channelTitle,
-    channelImageUrl: channelDetails[video.snippet.channelId] || "https://via.placeholder.com/30", 
-    concurrentUserCount: video.liveStreamingDetails?.concurrentViewers || 0, 
-    liveStreamUrl: `https://www.youtube.com/watch?v=${video.id}`
+    channelImageUrl: channelDetails[video.snippet.channelId] || "https://via.placeholder.com/30",
+    concurrentUserCount: video.liveStreamingDetails?.concurrentViewers || 0,
+    liveStreamUrl: `https://www.youtube.com/watch?v=${video.id}`,
   }));
 }
 
@@ -286,10 +289,10 @@ exports.handler = async function (event, context) {
       return {
         statusCode: validation.error.statusCode,
         headers: corsHeaders,
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           success: false,
-          error: validation.error.message 
-        })
+          error: validation.error.message,
+        }),
       };
     }
 
@@ -297,14 +300,14 @@ exports.handler = async function (event, context) {
       return {
         statusCode: 200,
         headers: corsHeaders,
-        body: ""
+        body: "",
       };
     }
 
     const { endpoint, path } = validation;
-    
+
     // 쿼리 파라미터 처리 개선
-    let queryParams = '';
+    let queryParams = "";
     if (event.rawQuery) {
       queryParams = event.rawQuery;
     } else if (event.queryStringParameters) {
@@ -320,37 +323,37 @@ exports.handler = async function (event, context) {
     console.log("쿼리 파라미터:", queryParams);
 
     // 2. 라이브 API 처리
-    if (endpoint === 'chzzk-lives') {
+    if (endpoint === "chzzk-lives") {
       const params = new URLSearchParams(queryParams);
       const data = await callChzzkApi({
-        size: params.get('size'),
-        next: params.get('next')
+        size: params.get("size"),
+        next: params.get("next"),
       });
-      
+
       return {
         statusCode: 200,
         headers: corsHeaders,
         body: JSON.stringify({
           success: true,
-          data: data
-        })
+          data: data,
+        }),
       };
     }
 
-    if (endpoint === 'youtube-lives') {
+    if (endpoint === "youtube-lives") {
       const params = new URLSearchParams(queryParams);
       const data = await callYoutubeApi({
-        query: params.get('query'),
-        maxResults: params.get('maxResults')
+        query: params.get("query"),
+        maxResults: params.get("maxResults"),
       });
-      
+
       return {
         statusCode: 200,
         headers: corsHeaders,
         body: JSON.stringify({
           success: true,
-          data: data
-        })
+          data: data,
+        }),
       };
     }
 
@@ -369,14 +372,14 @@ exports.handler = async function (event, context) {
       console.error("- NEXON_OPEN_API_KEY2:", !!process.env.NEXON_OPEN_API_KEY2);
       console.error("- NEXON_OPEN_API_KEY3:", !!process.env.NEXON_OPEN_API_KEY3);
       console.error("- NEXON_OPEN_API_KEY4:", !!process.env.NEXON_OPEN_API_KEY4);
-      
+
       return {
         statusCode: 500,
         headers: corsHeaders,
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           success: false,
-          error: "API 키가 서버에 설정되지 않았습니다." 
-        })
+          error: "API 키가 서버에 설정되지 않았습니다.",
+        }),
       };
     }
 
@@ -385,52 +388,55 @@ exports.handler = async function (event, context) {
     console.log(`선택된 API 키 (앞 8자리): ${apiKey.substring(0, 8)}...`);
 
     // 5. URL 및 파라미터 파싱
-    const remainingPath = path.replace(endpoint, '').replace(/^\/+/, '');
-    
+    const remainingPath = path.replace(endpoint, "").replace(/^\/+/, "");
+
     // URL 구성
     let apiUrl;
-    if (endpoint === 'ouid') {
+    if (endpoint === "ouid") {
       // OUID 조회는 특별 처리
-      const nickname = new URLSearchParams(queryParams).get('nickname');
+      const nickname = new URLSearchParams(queryParams).get("nickname");
       console.log("닉네임:", nickname);
-      
+
       if (!nickname) {
         console.error("닉네임 파라미터 누락");
         return {
           statusCode: 400,
           headers: corsHeaders,
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             success: false,
-            error: "닉네임 파라미터가 필요합니다." 
-          })
+            error: "닉네임 파라미터가 필요합니다.",
+          }),
         };
       }
       apiUrl = buildNexonApiUrl(endpoint, `user_name=${encodeURIComponent(nickname)}`);
     } else {
       // 나머지 엔드포인트는 OUID 기반
-      const ouid = new URLSearchParams(queryParams).get('ouid');
+      const ouid = new URLSearchParams(queryParams).get("ouid");
       console.log("OUID:", ouid);
-      
-      if (!ouid && endpoint !== 'match') {
+
+      if (!ouid && endpoint !== "match") {
         console.error("OUID 파라미터 누락");
         return {
           statusCode: 400,
           headers: corsHeaders,
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             success: false,
-            error: "OUID 파라미터가 필요합니다." 
-          })
+            error: "OUID 파라미터가 필요합니다.",
+          }),
         };
       }
-      
+
       let params = queryParams;
-      if (endpoint === 'match') {
-        // 매치 목록 조회는 추가 파라미터 처리
-        const matchMode = new URLSearchParams(queryParams).get('match_mode') || '폭파미션';
-        const matchType = new URLSearchParams(queryParams).get('match_type') || '일반전';
-        params = `ouid=${ouid}&match_mode=${encodeURIComponent(matchMode)}&match_type=${encodeURIComponent(matchType)}`;
+      if (endpoint === "match") {
+        // 🔥 매치 목록 조회는 match_type 파라미터 제거 (모든 타입 가져오기)
+        const matchMode = new URLSearchParams(queryParams).get("match_mode") || "폭파미션";
+
+        // 🔥 match_type 파라미터를 제거하여 모든 타입의 매치를 가져옴
+        params = `ouid=${ouid}&match_mode=${encodeURIComponent(matchMode)}`;
+
+        console.log("🔄 모든 매치 타입 조회 설정:", params);
       }
-      
+
       apiUrl = buildNexonApiUrl(endpoint, params);
     }
 
@@ -441,44 +447,43 @@ exports.handler = async function (event, context) {
       const data = await callNexonApi(apiUrl, apiKey);
       console.log("API 응답 성공");
       console.log("--- Netlify API 프록시 실행 종료 (성공) ---");
-      
+
       return {
         statusCode: 200,
         headers: corsHeaders,
         body: JSON.stringify({
           success: true,
-          data: data
-        })
+          data: data,
+        }),
       };
     } catch (apiError) {
       console.error("Nexon API 호출 실패:", apiError.message);
       console.error("API URL:", apiUrl);
       console.error("API 키 (앞 8자리):", apiKey.substring(0, 8) + "...");
-      
+
       return {
         statusCode: 500,
         headers: corsHeaders,
         body: JSON.stringify({
           success: false,
           error: "Nexon API 호출 실패",
-          details: apiError.message
-        })
+          details: apiError.message,
+        }),
       };
     }
-
   } catch (error) {
     console.error("[API 프록시] 예상치 못한 오류:", error.message);
     console.error("스택 트레이스:", error.stack);
     console.log("--- Netlify API 프록시 실행 종료 (실패) ---");
-    
+
     return {
       statusCode: 500,
       headers: corsHeaders,
       body: JSON.stringify({
         success: false,
         error: "서버 내부 오류가 발생했습니다.",
-        details: error.message
-      })
+        details: error.message,
+      }),
     };
   }
-}; 
+};
