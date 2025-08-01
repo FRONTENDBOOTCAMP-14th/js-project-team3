@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import { resolve } from "path";
+import postcssNested from 'postcss-nested';
 
 export default defineConfig({
   base: "./",
@@ -17,7 +18,11 @@ export default defineConfig({
   },
 
   css: {
-    postcss: false,
+    postcss: {
+      plugins: [
+        postcssNested(),
+      ],
+    },
     modules: false,
     preprocessorOptions: {
       css: {
