@@ -22,7 +22,6 @@ export async function renderScoreInfo(targetElement) {
         `;
         
         targetElement.innerHTML = html;
-        console.log("score-info.html 내용이 성공적으로 렌더링되었습니다.");
 
     } catch (error) {
         console.error("score-info.html 렌더링 중 오류 발생:", error);

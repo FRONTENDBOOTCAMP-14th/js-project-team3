@@ -19,8 +19,8 @@ window.tryNextThumbnailType = function(imgElement) {
 
 async function fetchLiveList(size = 20, next = null) {
     try {
-        // 치지직 API를 Netlify Functions를 통해 호출
-        let url = `/.netlify/functions/get-chzzk-lives?size=${size}`;
+        // 치지직 API를 통합 프록시를 통해 호출
+        let url = `/.netlify/functions/api-proxy/chzzk-lives?size=${size}`;
         if (next) {
             url += `&next=${next}`;
         }
@@ -72,8 +72,8 @@ async function fetchLiveList(size = 20, next = null) {
 
 async function fetchYoutubeLiveList(query, maxResults = 10) {
     try {
-        // 유튜브 API를 Netlify Functions를 통해 호출
-        const url = `/.netlify/functions/get-youtube-lives?query=${encodeURIComponent(query)}&maxResults=${maxResults}`;
+        // 유튜브 API를 통합 프록시를 통해 호출
+        const url = `/.netlify/functions/api-proxy/youtube-lives?query=${encodeURIComponent(query)}&maxResults=${maxResults}`;
 
         const headers = {
             "Content-Type": "application/json"

@@ -1,7 +1,10 @@
 /* eslint-disable no-console */
 
-export async function renderTotalStatistics(targetElement) {
+export async function renderTotalStatistics(targetElement, props = {}) {
     if (!targetElement) return;
+    
+    // API 데이터 받기
+    const userStats = props?.userStats || null;
     
     const html = `
     <main class="statistics container" role="main">
@@ -44,19 +47,13 @@ export async function renderTotalStatistics(targetElement) {
                 <span class="record-label-text">클랜전</span>
               </div>
               <div class="record-list-item" data-mode="clan" data-type="win" role="cell" aria-label="클랜전 전적">
-                -
+                ${userStats?.clan_win_rate ? `${userStats.clan_win_rate}%` : '-'}
               </div>
               <div class="record-list-item" data-mode="clan" data-type="kd" role="cell" aria-label="클랜전 킬데스">
-                -
+                ${userStats?.clan_kill_death_rate ? `${userStats.clan_kill_death_rate}%` : '-'}
               </div>
-              <div
-                class="record-list-item"
-                data-mode="clan"
-                data-type="assist"
-                role="cell"
-                aria-label="클랜전 어시스트"
-              >
-                -
+              <div class="record-list-item" data-mode="clan" data-type="assist" role="cell" aria-label="클랜전 어시스트">
+                ${userStats?.clan_assist_rate ? `${userStats.clan_assist_rate}%` : '-'}
               </div>
             </div>
 
@@ -66,19 +63,13 @@ export async function renderTotalStatistics(targetElement) {
                 <span class="record-label-text">솔로 랭크</span>
               </div>
               <div class="record-list-item" data-mode="solo" data-type="win" role="cell" aria-label="솔로 랭크 전적">
-                -
+                ${userStats?.solo_win_rate ? `${userStats.solo_win_rate}%` : '-'}
               </div>
               <div class="record-list-item" data-mode="solo" data-type="kd" role="cell" aria-label="솔로 랭크 킬데스">
-                -
+                ${userStats?.solo_kill_death_rate ? `${userStats.solo_kill_death_rate}%` : '-'}
               </div>
-              <div
-                class="record-list-item"
-                data-mode="solo"
-                data-type="assist"
-                role="cell"
-                aria-label="솔로 랭크 어시스트"
-              >
-                -
+              <div class="record-list-item" data-mode="solo" data-type="assist" role="cell" aria-label="솔로 랭크 어시스트">
+                ${userStats?.solo_assist_rate ? `${userStats.solo_assist_rate}%` : '-'}
               </div>
             </div>
 
@@ -88,19 +79,13 @@ export async function renderTotalStatistics(targetElement) {
                 <span class="record-label-text">파티 랭크</span>
               </div>
               <div class="record-list-item" data-mode="party" data-type="win" role="cell" aria-label="파티 랭크 전적">
-                -
+                ${userStats?.party_win_rate ? `${userStats.party_win_rate}%` : '-'}
               </div>
               <div class="record-list-item" data-mode="party" data-type="kd" role="cell" aria-label="파티 랭크 킬데스">
-                -
+                ${userStats?.party_kill_death_rate ? `${userStats.party_kill_death_rate}%` : '-'}
               </div>
-              <div
-                class="record-list-item"
-                data-mode="party"
-                data-type="assist"
-                role="cell"
-                aria-label="파티 랭크 어시스트"
-              >
-                -
+              <div class="record-list-item" data-mode="party" data-type="assist" role="cell" aria-label="파티 랭크 어시스트">
+                ${userStats?.party_assist_rate ? `${userStats.party_assist_rate}%` : '-'}
               </div>
             </div>
           </div>
@@ -388,6 +373,4 @@ export async function renderTotalStatistics(targetElement) {
     `;
     
     targetElement.innerHTML = html;
-    
-    // 기존 초기화 로직은 DOMContentLoaded 이벤트에서 처리됨
 }

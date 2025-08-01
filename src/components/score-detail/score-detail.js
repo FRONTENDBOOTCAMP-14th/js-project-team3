@@ -5,8 +5,11 @@ let OUID = null;
 const RESULT_KEY_VALUE = { 1: "승리", 2: "패배", 3: "무승부", DEFAULT: "-" };
 let MATCH_DETAIL_ID = "";
 
-export async function renderScoreDetail(targetElement) {
+export async function renderScoreDetail(targetElement, props = {}) {
     if (!targetElement) return;
+    
+    // API 데이터 받기
+    const matchList = props?.matchList || null;
     
     const html = `
     <section class="card-component-wrapper">
@@ -20,131 +23,60 @@ export async function renderScoreDetail(targetElement) {
         </ul>
       </section>
       <section class="card-body-section">
-        <ul class="match-history-list">
-          <li class="match-history-item">
-            <section class="match-preview-section">
-              <div class="match-result-box"></div>
-              <section class="match-padding-section">
-                <div class="match-type-box">
-                  <!-- match-result, match-type-text, match-date-text -->
-                </div>
-                <div class="match-map-box">
-                  <!-- match-map-text -->
-                </div>
-                <section class="match-stats-section grid-full-width-section">
-                  <div class="match-stats-box">
-                    <p class="match-stats-label-text">
-                      <img class="icon-stat" src="./src/assets/user_icon/user_score.svg" alt="" />
-                      킬뎃
-                    </p>
-                    <!-- kdRatio -->
-                  </div>
-                  <div class="match-stats-box">
-                    <p class="match-stats-label-text">
-                      <img class="icon-stat" src="./src/assets/user_icon/user_score.svg" alt="" />
-                      KDA
-                    </p>
-                    <!-- kill, death, assist -->
-                  </div>
-                  <div class="match-stats-box">
-                    <p class="match-stats-label-text">
-                      <img class="icon-stat" src="./src/assets/user_icon/user_crits_shot.svg" alt="" />
-                      헤드샷
-                    </p>
-                    <!-- headshotCount -->
-                  </div>
-                  <div class="match-stats-box">
-                    <p class="match-stats-label-text">
-                      <img class="icon-stat" src="./src/assets/user_icon/user_dealing.svg" alt="" />
-                      딜량
-                    </p>
-                    <!-- damageDealt -->
-                  </div>             
-                </section>
-                <button class="btn-match-detail grid-full-width-section" type="button">
-                  <!-- 매치 상세 버튼 -->
-                </button>
-              </section>
-            </section>
-            <section class="user-match-detail-wrapper">
-              <section class="match-header-section">
-                <p class="match-result-text"></p>
-                <p class="match-type-text"></p>
-                <p class="match-date-text"></p>
-                <button class="btn-mode-change">최근 동향 조회</button>
-              </section>
-              <section class="match-detail-section">
-                <section class="match-team-section win">
-                  <section class="match-team-header-section win">
-                    <p class="match-header-text win">승리</p>
-                  </section>
-                  <section class="match-team-body-section">
-                    <ul class="match-team-label-list">
-                      <li class="match-team-label-item">
-                        <p class="match-team-label-text">플레이어</p>
-                      </li>
-                      <li class="match-team-label-item">
-                        <p class="match-team-label-text">킬뎃</p>
-                      </li>
-                      <li class="match-team-label-item">
-                        <p class="match-team-label-text">KDA</p>
-                      </li>
-                      <li class="match-team-label-item">
-                        <p class="match-team-label-text">헤드샷</p>
-                      </li>
-                      <li class="match-team-label-item">
-                        <p class="match-team-label-text">딜량</p>
-                      </li>
-                    </ul>
-                    <ul class="match-team-list">
-                      <li><a class="btn-search-player" target="_blank">
-                        <img class="img-grade" alt="계급" />
-                        <p class="match-team-text"></p>
-                        <p class="match-team-text"></p>
-                        <p class="match-team-text"></p>
-                        <p class="match-team-text"></p>
-                        <p class="match-team-text"></p>
-                      </a></li>
-                    </ul>
+        <ul class="match-history-list" id="matchHistoryList">
+          ${matchList && matchList.length > 0 ? 
+            matchList.map(match => `
+              <li class="match-history-item" data-match-id="${match.match_id || ''}">
+                <section class="match-preview-section">
+                  <div class="match-result-box ${match.result === 1 ? 'win' : match.result === 2 ? 'lose' : ''}"></div>
+                  <section class="match-padding-section">
+                    <div class="match-type-box">
+                      <p class="match-result-text">${match.result === 1 ? '승리' : match.result === 2 ? '패배' : '무승부'}</p>
+                      <p class="match-type-text">${match.match_mode || '일반전'}</p>
+                      <p class="match-date-text">${match.date_created ? new Date(match.date_created).toLocaleDateString() : ''}</p>
+                    </div>
+                    <div class="match-map-box">
+                      <p class="match-map-text">${match.map_name || '알 수 없음'}</p>
+                    </div>
+                    <section class="match-stats-section grid-full-width-section">
+                      <div class="match-stats-box">
+                        <p class="match-stats-label-text">
+                          <img class="icon-stat" src="/icon/user_score.svg" alt="" />
+                          킬뎃
+                        </p>
+                        <p class="match-stats-value-text">${match.kill_death_rate ? `${match.kill_death_rate}%` : '-'}</p>
+                      </div>
+                      <div class="match-stats-box">
+                        <p class="match-stats-label-text">
+                          <img class="icon-stat" src="/icon/user_score.svg" alt="" />
+                          KDA
+                        </p>
+                        <p class="match-stats-value-text">${match.kill || 0}/${match.death || 0}/${match.assist || 0}</p>
+                      </div>
+                      <div class="match-stats-box">
+                        <p class="match-stats-label-text">
+                          <img class="icon-stat" src="/icon/user_crits_shot.svg" alt="" />
+                          헤드샷
+                        </p>
+                        <p class="match-stats-value-text">${match.headshot_count || 0}</p>
+                      </div>
+                      <div class="match-stats-box">
+                        <p class="match-stats-label-text">
+                          <img class="icon-stat" src="/icon/user_dealing.svg" alt="" />
+                          딜량
+                        </p>
+                        <p class="match-stats-value-text">${match.damage_dealt ? `${match.damage_dealt.toLocaleString()}` : '-'}</p>
+                      </div>             
+                    </section>
+                    <button class="btn-match-detail grid-full-width-section" type="button" data-match-id="${match.match_id || ''}">
+                      상세보기
+                    </button>
                   </section>
                 </section>
-                <section class="match-team-section lose">
-                  <section class="match-team-header-section lose">
-                    <p class="match-header-text lose">패배</p>
-                  </section>
-                  <section class="match-team-body-section">
-                    <ul class="match-team-label-list">
-                      <li class="match-team-label-item">
-                        <p class="match-team-label-text">플레이어</p>
-                      </li>
-                      <li class="match-team-label-item">
-                        <p class="match-team-label-text">킬뎃</p>
-                      </li>
-                      <li class="match-team-label-item">
-                        <p class="match-team-label-text">KDA</p>
-                      </li>
-                      <li class="match-team-label-item">
-                        <p class="match-team-label-text">헤드샷</p>
-                      </li>
-                      <li class="match-team-label-item">
-                        <p class="match-team-label-text">딜량</p>
-                      </li>
-                    </ul>
-                    <ul class="match-team-list">
-                      <li><a class="btn-search-player" target="_blank">
-                        <img class="img-grade" alt="계급" />
-                        <p class="match-team-text"></p>
-                        <p class="match-team-text"></p>
-                        <p class="match-team-text"></p>
-                        <p class="match-team-text"></p>
-                        <p class="match-team-text"></p>
-                      </a></li>
-                    </ul>
-                  </section>
-                </section>
-              </section>
-            </section>
-          </li>
+              </li>
+            `).join('') : 
+            '<li class="no-matches"><p>매치 기록이 없습니다.</p></li>'
+          }
         </ul>
       </section>
     </section>
@@ -152,7 +84,16 @@ export async function renderScoreDetail(targetElement) {
     
     targetElement.innerHTML = html;
     
-    init();
+    // 매치 상세보기 이벤트 리스너 추가
+    const detailButtons = targetElement.querySelectorAll('.btn-match-detail');
+    detailButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const matchId = e.target.dataset.matchId;
+            if (matchId) {
+                // 매치 상세 정보 조회 로직 추가 가능
+            }
+        });
+    });
 }
 
 function getTimeAgo(dateMatchString) {
@@ -389,11 +330,11 @@ const init = () => {
     return;
   }
 
-  // 닉네임으로 ouid 받아오기 - 서버리스 함수를 통해 호출
+  // 닉네임으로 ouid 받아오기 - 통합 프록시를 통해 호출
   buttonUserInfo.addEventListener("click", () => {
     const userName = inputNickName.value.trim();
     
-    fetch(`/.netlify/functions/get-ouid?nickname=${encodeURIComponent(userName)}`, {
+    fetch(`/.netlify/functions/api-proxy/ouid?nickname=${encodeURIComponent(userName)}`, {
       method: "GET",
     })
       .then((response) => response.json())
@@ -426,13 +367,13 @@ const init = () => {
           informationArea.innerHTML =
             "<p class=\"match-loading\">매치 정보를 로딩 중입니다...</p>";
 
-          //매치 목록 1차 요청 - 서버리스 함수를 통해 호출
+          //매치 목록 1차 요청 - 통합 프록시를 통해 호출
           const params = new URLSearchParams();
           params.set("ouid", OUID);
           params.set("match_mode", MATCH_MODE);
           if (matchTypeText) params.set("match_type", matchTypeText);
           
-          fetch(`/.netlify/functions/get-match-list?${params.toString()}`, {
+          fetch(`/.netlify/functions/api-proxy/match?${params.toString()}`, {
             method: "GET",
           })
             .then((response) => response.json())
@@ -451,8 +392,8 @@ const init = () => {
                 const li = renderMatchItem(item);
                 matchHistoryListUl.appendChild(li);
 
-                // 2차 요청 - 서버리스 함수를 통해 호출
-                fetch(`/.netlify/functions/get-match-detail?match_id=${item["match_id"]}`, {
+                // 2차 요청 - 통합 프록시를 통해 호출
+                fetch(`/.netlify/functions/api-proxy/match-detail?match_id=${item["match_id"]}`, {
                   method: "GET",
                 })
                   .then((response) => response.json())

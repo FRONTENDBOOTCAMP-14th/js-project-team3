@@ -6,7 +6,27 @@ import { renderTotalStatistics } from "../total-statistics/total-statistics.js";
 
 export async function renderRecordComponents(userData) {
     const recordSection = document.getElementById("record-section");
-    if (!recordSection) return;
+    if (!recordSection) {
+        console.error(`[RECORD] record-section 요소를 찾을 수 없습니다.`);
+        
+        // record-section을 동적으로 생성
+        const contentSection = document.getElementById("content-section");
+        if (contentSection) {
+            const newRecordSection = document.createElement("div");
+            newRecordSection.id = "record-section";
+            newRecordSection.className = "record-section";
+            newRecordSection.style.display = "none";
+            contentSection.appendChild(newRecordSection);
+            
+            // 새로 생성된 요소로 다시 시도
+            const newRecordSectionElement = document.getElementById("record-section");
+            if (newRecordSectionElement) {
+                return await renderRecordComponents(userData); // 재귀 호출
+            }
+        }
+        
+        throw new Error("record-section 요소를 찾을 수 없고 생성할 수도 없습니다.");
+    }
     
     const html = `
     <div class="record-container">
@@ -25,36 +45,49 @@ export async function renderRecordComponents(userData) {
     recordSection.innerHTML = html;
     
     try {
-        console.log(`[RECORD] 렌더링 시작 - 받은 데이터:`, userData);
-        
+        // UserInfo 컴포넌트 렌더링
         const userInfoSection = document.getElementById("user-info-section");
         if (userInfoSection) {
-            console.log(`[RECORD] UserInfo 컴포넌트 렌더링 - 데이터:`, userData.userInfo);
-            UserInfo(userInfoSection, { data: userData.userInfo || null }); 
+            try {
+                UserInfo(userInfoSection, { data: userData.userInfo || null });
+            } catch (error) {
+                console.error(`[RECORD] UserInfo 컴포넌트 렌더링 실패:`, error);
+            }
         }
 
+        // ScoreInfo 컴포넌트 렌더링
         const scoreInfoSection = document.getElementById("score-info-section");
         if (scoreInfoSection) {
-            console.log(`[RECORD] ScoreInfo 컴포넌트 렌더링`);
-            await renderScoreInfo(scoreInfoSection);
+            try {
+                await renderScoreInfo(scoreInfoSection);
+            } catch (error) {
+                console.error(`[RECORD] ScoreInfo 컴포넌트 렌더링 실패:`, error);
+            }
         }
 
+        // TotalStatistics 컴포넌트 렌더링
         const totalStatisticsSection = document.getElementById("total-statistics-section");
         if (totalStatisticsSection) {
-            console.log(`[RECORD] TotalStatistics 컴포넌트 렌더링`);
-            await renderTotalStatistics(totalStatisticsSection);
+            try {
+                await renderTotalStatistics(totalStatisticsSection, { userStats: userData.userStats });
+            } catch (error) {
+                console.error(`[RECORD] TotalStatistics 컴포넌트 렌더링 실패:`, error);
+            }
         }
         
+        // ScoreDetail 컴포넌트 렌더링
         const scoreDetailSection = document.getElementById("score-detail-section");
         if (scoreDetailSection) {
-            console.log(`[RECORD] ScoreDetail 컴포넌트 렌더링`);
-            await renderScoreDetail(scoreDetailSection);
+            try {
+                await renderScoreDetail(scoreDetailSection, { matchList: userData.matchList });
+            } catch (error) {
+                console.error(`[RECORD] ScoreDetail 컴포넌트 렌더링 실패:`, error);
+            }
         }
         
-        console.log("Record 컴포넌트 렌더링 완료");
-        
     } catch (error) {
-        console.error("Record 컴포넌트 렌더링 중 오류 :", error);
+        console.error(`[RECORD] Record 컴포넌트 렌더링 중 오류:`, error);
+        throw error;
     }
 }
 

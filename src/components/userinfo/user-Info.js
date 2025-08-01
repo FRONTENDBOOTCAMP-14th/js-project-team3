@@ -91,16 +91,41 @@ export function UserInfo(targetElement, props) {
 
   // --- 렌더링 영역 ---
   const render = () => {
-    const data = props?.data || mockUserInfo; //데이터 없는 경우 mock데이터 사용용
-    console.log(data);
-
-    const { basicInfo, rankInfo, recentInfo } = data;
-
-    // 데이터가 완전히 로드되지 않았을 경우를 대비
-    if (!basicInfo || !rankInfo || !recentInfo) {
+    const data = props?.data || mockUserInfo;
+    
+    // 데이터 구조 확인 및 변환
+    let basicInfo, rankInfo, recentInfo;
+    
+    if (data && data.basicInfo && data.rankInfo && data.recentInfo) {
+      // 새로운 구조 (API 데이터)
+      basicInfo = data.basicInfo;
+      rankInfo = data.rankInfo;
+      recentInfo = data.recentInfo;
+    } else if (data && data.basicInfo) {
+      // 기본 정보만 있는 경우
+      basicInfo = data.basicInfo;
+      rankInfo = data.rankInfo || {};
+      recentInfo = data.recentInfo || {};
+    } else if (data && typeof data === 'object') {
+      // 기존 구조 (mock 데이터) 또는 단일 객체
+      basicInfo = data.basicInfo || data;
+      rankInfo = data.rankInfo || {};
+      recentInfo = data.recentInfo || {};
+    } else {
+      // 데이터가 없는 경우
+      console.error(`[USERINFO] 유효한 데이터가 없습니다.`);
+      targetElement.innerHTML = `<div class="error">사용자 정보를 불러올 수 없습니다.</div>`;
       return;
     }
-    const { date, years } = formatDate(basicInfo.user_date_create);
+
+    // 데이터가 완전히 로드되지 않았을 경우를 대비
+    if (!basicInfo) {
+      console.error(`[USERINFO] basicInfo가 없습니다.`);
+      targetElement.innerHTML = `<div class="error">사용자 정보를 불러올 수 없습니다.</div>`;
+      return;
+    }
+    
+    const { date, years } = formatDate(basicInfo.user_date_create || new Date().toISOString());
 
     targetElement.innerHTML = `
     <div class="container user-info">
@@ -133,7 +158,7 @@ export function UserInfo(targetElement, props) {
                   basicInfo.user_name
                 }</div>
                 <span class="user-profile__body__info__content__rank">(${
-                  rankInfo.rank_ranking
+                  rankInfo.rank_ranking || rankInfo.grade_ranking || "정보 없음"
                 } 위)</span>
               </div>
             </div>
@@ -143,13 +168,13 @@ export function UserInfo(targetElement, props) {
                 <div class="stat-item__left">
                   <div class="stat-item__value__top"><img src="/icon/user_win_rate.svg" alt="승률" />승률</div>
                   <div class="stat-item__value__bottom">${Number(
-                    recentInfo.recent_win_rate
+                    recentInfo.recent_win_rate || 0
                   ).toFixed(2)}%</div>
                 </div>
                 <div class="stat-item__right">
                   <div class="stat-item__value__top"><img src="/icon/user_score.svg" alt="킬뎃" />킬뎃</div>
                   <div class="stat-item__value__bottom">${Number(
-                    recentInfo.recent_kill_death_rate
+                    recentInfo.recent_kill_death_rate || 0
                   ).toFixed(2)}%</div>
                 </div>
               </div>
@@ -157,13 +182,13 @@ export function UserInfo(targetElement, props) {
                 <div class="stat-item__left">
                   <div class="stat-item__value__top"><img src="/icon/user_gun.svg" alt="라플" />라플</div>
                   <div class="stat-item__value__bottom">${Number(
-                    recentInfo.recent_assault_rate
+                    recentInfo.recent_assault_rate || 0
                   ).toFixed(2)}%</div>
                 </div>
                 <div class="stat-item__right">
                   <div class="stat-item__value__top"><img src="/icon/user_gun.svg" alt="스나" />스나</div>
                   <div class="stat-item__value__bottom">${Number(
-                    recentInfo.recent_sniper_rate
+                    recentInfo.recent_sniper_rate || 0
                   ).toFixed(2)}%</div>
                 </div>
               </div>
@@ -171,7 +196,7 @@ export function UserInfo(targetElement, props) {
                 <div class="stat-item__left">
                   <div class="stat-item__value__top"><img src="/icon/user_gun.svg" alt="특수" />특수</div>
                   <div class="stat-item__value__bottom">${Number(
-                    recentInfo.recent_special_rate
+                    recentInfo.recent_special_rate || 0
                   ).toFixed(2)}%</div>
                 </div>
                 <div class="stat-item__right">
