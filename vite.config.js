@@ -11,6 +11,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, "index.html"),
       },
+      external: ['crypto'],
     },
     cssCodeSplit: false,
     minify: 'esbuild',
@@ -51,7 +52,7 @@ export default defineConfig({
   },
 
   optimizeDeps: {
-    exclude: ['postcss'],
+    exclude: ['crypto', 'postcss'],
   },
 
   define: {
