@@ -56,33 +56,61 @@ exports.handler = async function(event, context) {
 
         console.log(`[CHZZK] API 호출: ${url}`);
         
-        const response = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Client-Id": clientId,
-                "Client-Secret": clientSecret,
-                "Content-Type": "application/json"
-            }
-        });
-
-        console.log(`[CHZZK] 응답 상태: ${response.status}`);
+        // AbortController를 사용한 타임아웃 설정 (5초)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
         
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`[CHZZK] API 오류: ${response.status} - ${errorText}`);
-            throw new Error(`HTTP error! status: ${response.status}`);
+        try {
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Client-Id": clientId,
+                    "Client-Secret": clientSecret,
+                    "Content-Type": "application/json"
+                },
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            console.log(`[CHZZK] 응답 상태: ${response.status}`);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`[CHZZK] API 오류: ${response.status} - ${errorText}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            console.log(`[CHZZK] API 응답 구조:`, JSON.stringify(data, null, 2));
+            console.log(`[CHZZK] API 응답 키:`, Object.keys(data));
+
+            return {
+                statusCode: 200,
+                headers: headers,
+                body: JSON.stringify({
+                    success: true,
+                    data: data
+                })
+            };
+        } catch (fetchError) {
+            clearTimeout(timeoutId);
+            
+            if (fetchError.name === 'AbortError') {
+                console.error(`[CHZZK] API 타임아웃 (5초 초과)`);
+                return {
+                    statusCode: 408,
+                    headers: headers,
+                    body: JSON.stringify({
+                        success: false,
+                        error: "API request timeout"
+                    })
+                };
+            }
+            
+            throw fetchError;
         }
-
-        const data = await response.json();
-
-        return {
-            statusCode: 200,
-            headers: headers,
-            body: JSON.stringify({
-                success: true,
-                data: data
-            })
-        };
 
     } catch (error) {
         console.error("Error:", error);

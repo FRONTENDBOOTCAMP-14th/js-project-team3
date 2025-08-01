@@ -29,24 +29,41 @@ async function fetchLiveList(size = 20, next = null) {
             "Content-Type": "application/json"
         };
 
-        const response = await fetch(url, {
-            method: "GET",
-            headers: headers
-        });
+        // 클라이언트에서도 타임아웃 설정 (8초)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-        const data = await response.json(); 
-        
-        if (!response.ok) { 
-            throw new Error(`HTTP 요청 실패 : ${response.status} - ${data.error || response.statusText}`);
+        try {
+            const response = await fetch(url, {
+                method: "GET",
+                headers: headers,
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            const data = await response.json(); 
+            
+            if (!response.ok) { 
+                throw new Error(`HTTP 요청 실패 : ${response.status} - ${data.error || response.statusText}`);
+            }
+
+            // 서버 응답 구조 확인
+            if (!data.success) {
+                throw new Error(`API 내부 오류 : ${data.error || "알 수 없는 오류"}`);
+            }
+
+            // 서버에서 { success: true, data: ... } 형태로 응답하므로 data.data를 반환
+            return data.data;
+        } catch (fetchError) {
+            clearTimeout(timeoutId);
+            
+            if (fetchError.name === 'AbortError') {
+                throw new Error('치지직 API 요청 시간 초과 (8초)');
+            }
+            
+            throw fetchError;
         }
-
-        // 서버 응답 구조 확인
-        if (!data.success) {
-            throw new Error(`API 내부 오류 : ${data.error || "알 수 없는 오류"}`);
-        }
-
-        // 서버에서 { success: true, data: ... } 형태로 응답하므로 data.data를 반환
-        return data.data;
     } catch (error) {
         console.error("치지직 라이브 목록 조회 중 오류 발생 :", error); 
         return null;
@@ -176,6 +193,7 @@ async function initializeLiveList() {
         chzzkLiveContainer.innerHTML = `
             <div class="live-status-wrapper">
                 <p>치지직 라이브 목록을 가져오는데 실패했습니다.</p>
+                <p style="font-size: 12px; color: #666; margin-top: 8px;">일시적인 서버 문제일 수 있습니다. 잠시 후 다시 시도해주세요.</p>
             </div>`;
     }
 
