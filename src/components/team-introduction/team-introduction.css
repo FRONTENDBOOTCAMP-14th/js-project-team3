@@ -52,38 +52,38 @@
   transition: background-image 0.3s, transform 0.3s;
 }
 
-.team-member__img-wrap.member-img01 {
+.member-img01 {
   background-image: url("/images/member-01.png");
 }
 
-.team-member__img-wrap.member-img01:hover {
+.member-img01:hover {
   background-image: url("/images/member-01-over.png");
   transform: scale(1.01) rotate(-0.5deg);
 }
 
-.team-member__img-wrap.member-img02 {
+.member-img02 {
   background-image: url("/images/member-02.png");
 }
 
-.team-member__img-wrap.member-img02:hover {
+.member-img02:hover {
   background-image: url("/images/member-02-over.png");
   transform: scale(1.01) rotate(-0.5deg);
 }
 
-.team-member__img-wrap.member-img03 {
+.member-img03 {
   background-image: url("/images/member-03.png");
 }
 
-.team-member__img-wrap.member-img03:hover {
+.member-img03:hover {
   background-image: url("/images/member-03-over.png");
   transform: scale(1.01) rotate(-0.5deg);
 }
 
-.team-member__img-wrap.member-img04 {
+.member-img04 {
   background-image: url("/images/member-04.png");
 }
 
-.team-member__img-wrap.member-img04:hover {
+.member-img04:hover {
   background-image: url("/images/member-04-over.png");
   transform: scale(1.01) rotate(-0.5deg);
 }
