@@ -19,84 +19,235 @@ window.tryNextThumbnailType = function(imgElement) {
 
 async function fetchLiveList(size = 20, next = null) {
     try {
-        // 치지직 API를 통합 프록시를 통해 호출
-        let url = `/.netlify/functions/api-proxy/chzzk-lives?size=${size}`;
-        if (next) {
-            url += `&next=${next}`;
-        }
-
-        const headers = {
-            "Content-Type": "application/json"
-        };
-
-        // 클라이언트에서도 타임아웃 설정 (8초)
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-        try {
-            const response = await fetch(url, {
-                method: "GET",
-                headers: headers,
-                signal: controller.signal
-            });
-
-            clearTimeout(timeoutId);
-
-            const data = await response.json(); 
+        const isDevelopment = import.meta.env.DEV;
+        
+        if (isDevelopment) {
+            // 개발 환경에서는 직접 치지직 API 호출 (환경 변수 필요)
+            const clientId = import.meta.env.VITE_NAVER_CLIENT_ID;
+            const clientSecret = import.meta.env.VITE_NAVER_CLIENT_SECRET;
             
-            if (!response.ok) { 
-                throw new Error(`HTTP 요청 실패 : ${response.status} - ${data.error || response.statusText}`);
-            }
-
-            // 서버 응답 구조 확인
-            if (!data.success) {
-                throw new Error(`API 내부 오류 : ${data.error || "알 수 없는 오류"}`);
-            }
-
-            // 서버에서 { success: true, data: ... } 형태로 응답하므로 data.data를 반환
-            return data.data;
-        } catch (fetchError) {
-            clearTimeout(timeoutId);
-            
-            if (fetchError.name === 'AbortError') {
-                throw new Error('치지직 API 요청 시간 초과 (8초)');
+            if (!clientId || !clientSecret) {
+                console.warn("개발 환경에서 치지직 API 키가 설정되지 않았습니다. .env 파일을 확인하세요.");
+                return null;
             }
             
-            throw fetchError;
+            let url = `https://api.chzzk.naver.com/service/v1/lives?size=${size}`;
+            if (next) {
+                url += `&next=${next}`;
+            }
+            
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+            
+            try {
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Client-Id": clientId,
+                        "Client-Secret": clientSecret,
+                        "Content-Type": "application/json"
+                    },
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`치지직 API 오류: ${response.status} - ${errorText}`);
+                }
+                
+                const responseData = await response.json();
+                
+                // 치지직 API 응답 구조 확인 및 변환
+                if (responseData.code && responseData.code !== "SUCCESS") {
+                    throw new Error(`치지직 API 오류: ${responseData.message || responseData.code}`);
+                }
+                
+                // 응답 데이터를 클라이언트가 기대하는 형태로 변환
+                const transformedData = {
+                    content: responseData.content || [],
+                    next: responseData.next || null
+                };
+                
+                // 각 라이브 항목을 클라이언트가 기대하는 형태로 변환
+                if (transformedData.content && Array.isArray(transformedData.content)) {
+                    transformedData.content = transformedData.content.map(live => ({
+                        platform: "chzzk",
+                        liveTitle: live.liveTitle || live.title || "제목 없음",
+                        liveThumbnailImageUrl: live.liveThumbnailImageUrl || live.thumbnailImageUrl || "",
+                        channelId: live.channelId || "",
+                        channelName: live.channelName || live.authorName || "채널명 없음",
+                        channelImageUrl: live.channelImageUrl || live.authorImageUrl || "https://via.placeholder.com/30",
+                        concurrentUserCount: live.concurrentUserCount || live.viewerCount || 0,
+                        liveStreamUrl: live.liveStreamUrl || `https://chzzk.naver.com/live/${live.liveId || live.id}`,
+                        categoryType: live.categoryType || "GAME",
+                        liveId: live.liveId || live.id
+                    }));
+                }
+                
+                return transformedData;
+            } catch (fetchError) {
+                clearTimeout(timeoutId);
+                
+                if (fetchError.name === 'AbortError') {
+                    throw new Error('치지직 API 요청 시간 초과 (8초)');
+                }
+                
+                throw fetchError;
+            }
+        } else {
+            // 프로덕션 환경에서는 Netlify Functions 사용
+            let url = `/.netlify/functions/api-proxy/chzzk-lives?size=${size}`;
+            if (next) {
+                url += `&next=${next}`;
+            }
+
+            const headers = {
+                "Content-Type": "application/json"
+            };
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+            try {
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: headers,
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                const data = await response.json(); 
+                
+                if (!response.ok) { 
+                    throw new Error(`HTTP 요청 실패 : ${response.status} - ${data.error || response.statusText}`);
+                }
+
+                if (!data.success) {
+                    throw new Error(`API 내부 오류 : ${data.error || "알 수 없는 오류"}`);
+                }
+
+                return data.data;
+            } catch (fetchError) {
+                clearTimeout(timeoutId);
+                
+                if (fetchError.name === 'AbortError') {
+                    throw new Error('치지직 API 요청 시간 초과 (8초)');
+                }
+                
+                throw fetchError;
+            }
         }
     } catch (error) {
         console.error("치지직 라이브 목록 조회 중 오류 발생 :", error); 
+        console.error("오류 상세 정보:", {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+        });
         return null;
     }
 }
 
 async function fetchYoutubeLiveList(query, maxResults = 10) {
     try {
-        // 유튜브 API를 통합 프록시를 통해 호출
-        const url = `/.netlify/functions/api-proxy/youtube-lives?query=${encodeURIComponent(query)}&maxResults=${maxResults}`;
-
-        const headers = {
-            "Content-Type": "application/json"
-        };
-
-        const response = await fetch(url, {
-            method: "GET",
-            headers: headers
-        });
-
-        const data = await response.json();
+        const isDevelopment = import.meta.env.DEV;
         
-        if (!response.ok) { 
-            throw new Error(`HTTP 요청 실패 : ${response.status} - ${data.error || response.statusText}`);
-        }
+        if (isDevelopment) {
+            // 개발 환경에서는 직접 YouTube API 호출 (환경 변수 필요)
+            const youtubeApiKey = import.meta.env.VITE_YOUTUBE_OPEN_API_KEY;
+            
+            if (!youtubeApiKey) {
+                console.warn("개발 환경에서 YouTube API 키가 설정되지 않았습니다. .env 파일을 확인하세요.");
+                return null;
+            }
+            
+            // YouTube Search API 호출
+            const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&eventType=live&key=${youtubeApiKey}&maxResults=${maxResults}`;
+            
+            const searchResponse = await fetch(searchUrl);
+            const searchData = await searchResponse.json();
 
-        // 서버 응답 구조 확인
-        if (!data.success) {
-            throw new Error(`API 내부 오류 : ${data.error || "알 수 없는 오류"}`);
-        }
+            if (!searchResponse.ok) {
+                throw new Error(`YouTube Search API error: ${searchResponse.status}`);
+            }
 
-        // 서버에서 { success: true, data: ... } 형태로 응답하므로 data.data를 반환
-        return data.data;
+            const videoIds = searchData.items.map(item => item.id.videoId).filter(id => id);
+            
+            if (videoIds.length === 0) {
+                return [];
+            }
+
+            // YouTube Videos API 호출
+            const videoDetailsUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id=${videoIds.join(",")}&key=${youtubeApiKey}`;
+            
+            const videoDetailsResponse = await fetch(videoDetailsUrl);
+            const videoDetailsData = await videoDetailsResponse.json();
+
+            if (!videoDetailsResponse.ok) {
+                throw new Error(`YouTube Videos API error: ${videoDetailsResponse.status}`);
+            }
+
+            // 채널 정보 가져오기
+            const channelsToFetch = new Set();
+            videoDetailsData.items.forEach(video => {
+                channelsToFetch.add(video.snippet.channelId);
+            });
+
+            const channelIds = Array.from(channelsToFetch).filter(id => id);
+            let channelDetails = {};
+            
+            if (channelIds.length > 0) {
+                const channelDetailsUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelIds.join(",")}&key=${youtubeApiKey}`;
+                
+                const channelDetailsResponse = await fetch(channelDetailsUrl);
+                const channelDetailsData = await channelDetailsResponse.json();
+
+                if (channelDetailsResponse.ok) {
+                    channelDetailsData.items.forEach(channel => {
+                        channelDetails[channel.id] = channel.snippet.thumbnails.default.url;
+                    });
+                }
+            }
+            
+            // 응답 데이터 구성
+            return videoDetailsData.items.map(video => ({
+                platform: "youtube", 
+                liveTitle: video.snippet.title,
+                liveThumbnailImageUrl: video.snippet.thumbnails.high?.url || video.snippet.thumbnails.medium?.url || video.snippet.thumbnails.default?.url,
+                channelId: video.snippet.channelId,
+                channelName: video.snippet.channelTitle,
+                channelImageUrl: channelDetails[video.snippet.channelId] || "https://via.placeholder.com/30", 
+                concurrentUserCount: video.liveStreamingDetails?.concurrentViewers || 0, 
+                liveStreamUrl: `https://www.youtube.com/watch?v=${video.id}`
+            }));
+        } else {
+            // 프로덕션 환경에서는 Netlify Functions 사용
+            const url = `/.netlify/functions/api-proxy/youtube-lives?query=${encodeURIComponent(query)}&maxResults=${maxResults}`;
+
+            const headers = {
+                "Content-Type": "application/json"
+            };
+
+            const response = await fetch(url, {
+                method: "GET",
+                headers: headers
+            });
+
+            const data = await response.json();
+            
+            if (!response.ok) { 
+                throw new Error(`HTTP 요청 실패 : ${response.status} - ${data.error || response.statusText}`);
+            }
+
+            if (!data.success) {
+                throw new Error(`API 내부 오류 : ${data.error || "알 수 없는 오류"}`);
+            }
+
+            return data.data;
+        }
     } catch (error) {
         console.error("유튜브 라이브 목록 조회 중 오류 발생 :", error); 
         return null;
@@ -174,8 +325,23 @@ async function initializeLiveList() {
         </div>`;
 
     const chzzkResult = await fetchLiveList(20);
+    console.log("치지직 API 응답 결과:", chzzkResult);
+    
     if (chzzkResult && chzzkResult.content) {
-        const chzzkGameLives = chzzkResult.content.filter(function(live) { return live.categoryType === "GAME"; });
+        console.log("치지직 라이브 목록 구조:", {
+            totalCount: chzzkResult.content.length,
+            sampleItem: chzzkResult.content[0]
+        });
+        
+        const chzzkGameLives = chzzkResult.content.filter(function(live) { 
+            return live.categoryType === "GAME"; 
+        });
+        
+        console.log("치지직 게임 라이브 필터링 결과:", {
+            totalLives: chzzkResult.content.length,
+            gameLives: chzzkGameLives.length
+        });
+        
         const chzzkLivesToRender = chzzkGameLives.slice(0, 10);
 
         if (chzzkLivesToRender.length > 0) {
@@ -190,10 +356,10 @@ async function initializeLiveList() {
         }
     } else {
         console.error("치지직 라이브 목록을 가져올 수 없습니다.");
+        console.error("응답 구조:", chzzkResult);
         chzzkLiveContainer.innerHTML = `
             <div class="live-status-wrapper">
                 <p>치지직 라이브 목록을 가져오는데 실패했습니다.</p>
-                <p style="font-size: 12px; color: #666; margin-top: 8px;">일시적인 서버 문제일 수 있습니다. 잠시 후 다시 시도해주세요.</p>
             </div>`;
     }
 

@@ -150,7 +150,19 @@ async function callChzzkApi(params) {
   const clientId = process.env.VITE_NAVER_CLIENT_ID || process.env.NAVER_CLIENT_ID;
   const clientSecret = process.env.VITE_NAVER_CLIENT_SECRET || process.env.NAVER_CLIENT_SECRET;
 
+  console.log("치지직 API 환경 변수 확인:");
+  console.log("- VITE_NAVER_CLIENT_ID:", !!process.env.VITE_NAVER_CLIENT_ID);
+  console.log("- VITE_NAVER_CLIENT_SECRET:", !!process.env.VITE_NAVER_CLIENT_SECRET);
+  console.log("- NAVER_CLIENT_ID:", !!process.env.NAVER_CLIENT_ID);
+  console.log("- NAVER_CLIENT_SECRET:", !!process.env.NAVER_CLIENT_SECRET);
+
   if (!clientId || !clientSecret) {
+    console.error("치지직 API credentials not configured");
+    console.error("환경 변수 확인:");
+    console.error("- VITE_NAVER_CLIENT_ID:", !!process.env.VITE_NAVER_CLIENT_ID);
+    console.error("- VITE_NAVER_CLIENT_SECRET:", !!process.env.VITE_NAVER_CLIENT_SECRET);
+    console.error("- NAVER_CLIENT_ID:", !!process.env.NAVER_CLIENT_ID);
+    console.error("- NAVER_CLIENT_SECRET:", !!process.env.NAVER_CLIENT_SECRET);
     throw new Error("치지직 API credentials not configured");
   }
 
@@ -162,8 +174,15 @@ async function callChzzkApi(params) {
     url += `&next=${next}`;
   }
 
+  console.log("치지직 API 요청 URL:", url);
+  console.log("치지직 API 요청 헤더:", {
+    "Client-Id": clientId.substring(0, 8) + "...",
+    "Client-Secret": clientSecret.substring(0, 8) + "..."
+  });
+
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초로 증가
 
   try {
     const response = await fetch(url, {
@@ -177,20 +196,67 @@ async function callChzzkApi(params) {
     });
 
     clearTimeout(timeoutId);
-
+    
+    console.log("치지직 API 응답 상태:", response.status);
+    console.log("치지직 API 응답 헤더:", Object.fromEntries(response.headers.entries()));
+    
     if (!response.ok) {
       const errorText = await response.text();
+      console.error("치지직 API 에러 응답:", errorText);
       throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
     }
 
-    return await response.json();
-  } catch (error) {
-    clearTimeout(timeoutId);
+    const responseData = await response.json();
+    console.log("치지직 API 응답 데이터 구조:", {
+      hasContent: !!responseData.content,
+      contentLength: responseData.content ? responseData.content.length : 0,
+      hasCode: !!responseData.code,
+      hasMessage: !!responseData.message
+    });
 
-    if (error.name === "AbortError") {
-      throw new Error("API request timeout");
+    // 치지직 API 응답 구조 확인 및 변환
+    if (responseData.code && responseData.code !== "SUCCESS") {
+      throw new Error(`치지직 API 오류: ${responseData.message || responseData.code}`);
     }
 
+    // 응답 데이터를 클라이언트가 기대하는 형태로 변환
+    const transformedData = {
+      content: responseData.content || [],
+      next: responseData.next || null
+    };
+
+    // 각 라이브 항목을 클라이언트가 기대하는 형태로 변환
+    if (transformedData.content && Array.isArray(transformedData.content)) {
+      transformedData.content = transformedData.content.map(live => ({
+        platform: "chzzk",
+        liveTitle: live.liveTitle || live.title || "제목 없음",
+        liveThumbnailImageUrl: live.liveThumbnailImageUrl || live.thumbnailImageUrl || "",
+        channelId: live.channelId || "",
+        channelName: live.channelName || live.authorName || "채널명 없음",
+        channelImageUrl: live.channelImageUrl || live.authorImageUrl || "https://via.placeholder.com/30",
+        concurrentUserCount: live.concurrentUserCount || live.viewerCount || 0,
+        liveStreamUrl: live.liveStreamUrl || `https://chzzk.naver.com/live/${live.liveId || live.id}`,
+        categoryType: live.categoryType || "GAME",
+        liveId: live.liveId || live.id
+      }));
+    }
+
+    console.log("치지직 API 변환된 데이터:", {
+      contentLength: transformedData.content.length,
+      hasNext: !!transformedData.next,
+      sampleItem: transformedData.content[0]
+    });
+
+    return transformedData;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    
+    if (error.name === 'AbortError') {
+      console.error("치지직 API 요청 시간 초과 (10초)");
+      throw new Error("치지직 API 요청 시간 초과");
+    }
+    
+    console.error("치지직 API 호출 중 오류:", error.message);
     throw error;
   }
 }
@@ -323,21 +389,44 @@ exports.handler = async function (event, context) {
     console.log("쿼리 파라미터:", queryParams);
 
     // 2. 라이브 API 처리
-    if (endpoint === "chzzk-lives") {
-      const params = new URLSearchParams(queryParams);
-      const data = await callChzzkApi({
-        size: params.get("size"),
-        next: params.get("next"),
-      });
-
-      return {
-        statusCode: 200,
-        headers: corsHeaders,
-        body: JSON.stringify({
-          success: true,
-          data: data,
-        }),
-      };
+    if (endpoint === 'chzzk-lives') {
+      try {
+        const params = new URLSearchParams(queryParams);
+        console.log("치지직 라이브 API 호출 시작");
+        console.log("파라미터:", {
+          size: params.get('size'),
+          next: params.get('next')
+        });
+        
+        const data = await callChzzkApi({
+          size: params.get('size'),
+          next: params.get('next')
+        });
+        
+        console.log("치지직 라이브 API 호출 성공");
+        
+        return {
+          statusCode: 200,
+          headers: corsHeaders,
+          body: JSON.stringify({
+            success: true,
+            data: data
+          })
+        };
+      } catch (error) {
+        console.error("치지직 라이브 API 처리 중 오류:", error.message);
+        console.error("오류 스택:", error.stack);
+        
+        return {
+          statusCode: 500,
+          headers: corsHeaders,
+          body: JSON.stringify({
+            success: false,
+            error: "치지직 라이브 API 호출 실패",
+            details: error.message
+          })
+        };
+      }
     }
 
     if (endpoint === "youtube-lives") {
