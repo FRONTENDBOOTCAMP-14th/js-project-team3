@@ -1,5 +1,5 @@
 import "./user-Info.css";
-import "../otherinfo/other-info.css";
+import "../otherinfo/other-Info.css";
 import { formatDate } from "../../utils/date";
 import { OtherInfo } from "../otherinfo/other-info.js";
 import total_grade_Response from "../../data/total_grade_Response.json";
