@@ -29,17 +29,17 @@ exports.handler = async function(event, context) {
         const size = event.queryStringParameters?.size || 20;
         const next = event.queryStringParameters?.next;
         
-        // 클라이언트 ID와 시크릿 추출
-        const clientId = event.headers["client-id"];
-        const clientSecret = event.headers["client-secret"];
+        // 환경변수에서 클라이언트 ID와 시크릿 가져오기
+        const clientId = process.env.VITE_NAVER_CLIENT_ID;
+        const clientSecret = process.env.VITE_NAVER_CLIENT_SECRET;
 
         if (!clientId || !clientSecret) {
             return {
-                statusCode: 400,
+                statusCode: 500,
                 headers: headers,
                 body: JSON.stringify({ 
                     success: false,
-                    error: "Client-Id and Client-Secret headers are required" 
+                    error: "API credentials not configured" 
                 })
             };
         }

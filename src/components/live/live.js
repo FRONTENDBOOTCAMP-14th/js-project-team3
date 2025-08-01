@@ -23,14 +23,12 @@ window.tryNextThumbnailType = function(imgElement) {
 
 async function fetchLiveList(size = 20, next = null) {
     try {
-        let url = `/api/chzzk/lives?size=${size}`;
+        let url = `/.netlify/functions/get-chzzk-lives?size=${size}`;
         if (next) {
             url += `&next=${next}`;
         }
 
         const headers = {
-            "Client-Id": CLIENT_ID,
-            "Client-Secret": CLIENT_SECRET,
             "Content-Type": "application/json"
         };
 
