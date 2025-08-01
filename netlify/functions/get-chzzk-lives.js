@@ -33,6 +33,9 @@ exports.handler = async function(event, context) {
         const clientId = process.env.VITE_NAVER_CLIENT_ID;
         const clientSecret = process.env.VITE_NAVER_CLIENT_SECRET;
 
+        console.log(`[CHZZK] 환경변수 확인 - ClientId: ${clientId ? '설정됨' : '설정되지 않음'}, ClientSecret: ${clientSecret ? '설정됨' : '설정되지 않음'}`);
+        console.log(`[CHZZK] 사용 가능한 환경변수:`, Object.keys(process.env).filter(key => key.includes('NAVER')));
+
         if (!clientId || !clientSecret) {
             return {
                 statusCode: 500,
@@ -82,12 +85,17 @@ exports.handler = async function(event, context) {
 
     } catch (error) {
         console.error("Error:", error);
+        console.error("Error stack:", error.stack);
+        console.error("Error name:", error.name);
+        console.error("Error message:", error.message);
+        
         return {
             statusCode: 500,
             headers: headers,
             body: JSON.stringify({
                 success: false,
-                error: error.message
+                error: error.message,
+                stack: error.stack
             })
         };
     }

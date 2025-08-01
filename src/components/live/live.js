@@ -40,14 +40,16 @@ async function fetchLiveList(size = 20, next = null) {
         const data = await response.json(); 
         
         if (!response.ok) { 
-            throw new Error(`HTTP 요청 실패 : ${response.status} - ${data.message || response.statusText}`);
+            throw new Error(`HTTP 요청 실패 : ${response.status} - ${data.error || response.statusText}`);
         }
 
-        if (data.code && data.code !== 200) {
-            throw new Error(`API 내부 오류 : ${data.code} - ${data.message || "알 수 없는 오류"}`);
+        // 서버 응답 구조 확인
+        if (!data.success) {
+            throw new Error(`API 내부 오류 : ${data.error || "알 수 없는 오류"}`);
         }
 
-        return data.content;
+        // 서버에서 { success: true, data: ... } 형태로 응답하므로 data.data를 반환
+        return data.data;
     } catch (error) {
         console.error("치지직 라이브 목록 조회 중 오류 발생 :", error); 
         return null;
@@ -190,8 +192,8 @@ async function initializeLiveList() {
         </div>`;
 
     const chzzkResult = await fetchLiveList(20);
-    if (chzzkResult && chzzkResult.data) {
-        const chzzkGameLives = chzzkResult.data.filter(function(live) { return live.categoryType === "GAME"; });
+    if (chzzkResult && chzzkResult.content) {
+        const chzzkGameLives = chzzkResult.content.filter(function(live) { return live.categoryType === "GAME"; });
         const chzzkLivesToRender = chzzkGameLives.slice(0, 10);
 
         if (chzzkLivesToRender.length > 0) {
