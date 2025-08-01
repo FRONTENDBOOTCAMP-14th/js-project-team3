@@ -179,7 +179,7 @@ async function initializeLiveList() {
 
     if (!chzzkLiveContainer || !youtubeLiveContainer) { 
         console.error("하나 이상의 라이브 컨테이너 요소를 찾을 수 없습니다. HTML을 확인해주세요.");
-        return;
+        return; 
     }
     
     chzzkLiveContainer.innerHTML = `
