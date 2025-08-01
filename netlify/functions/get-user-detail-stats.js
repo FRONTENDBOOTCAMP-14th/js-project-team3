@@ -1,5 +1,3 @@
-const axios = require('axios');
-
 exports.handler = async function(event, context) {
     // CORS 헤더 설정
     const headers = {
