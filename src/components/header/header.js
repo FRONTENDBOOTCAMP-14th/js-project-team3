@@ -1,15 +1,31 @@
 export async function renderHeader(targetElement) {
   if (!targetElement) return;
 
-  const html = await fetch("src/components/header/header.html").then(function (res) {
-    return res.text();
-  });
+  const html = `
+<header>
+  <div class="header container">
+    <a href="/" class="header-logo">
+      <img src="/images/logo.png" alt="GG어택 로고" />
+    </a>
+    <nav class="header-nav">
+      <ul class="header-nav__list">
+        <li>
+          <button class="nav-btn" onclick="window.routeTo('home')">Team</button>
+        </li>
+        <li>
+          <button class="nav-btn" onclick="window.routeTo('score')">Score</button>
+        </li>
+        <li>
+          <button class="nav-btn" onclick="window.routeTo('news')">News</button>
+        </li>
+        <li>
+          <button class="nav-btn" onclick="window.routeTo('live')">Live</button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+  `;
 
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-  const headerContent = doc.querySelector("header");
-
-  if (headerContent) {
-    targetElement.innerHTML = headerContent.outerHTML;
-  }
+  targetElement.innerHTML = html;
 }

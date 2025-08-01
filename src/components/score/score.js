@@ -170,12 +170,22 @@ async function searchAndRenderUser(nickname) {
 export async function renderScorePage(targetElement, params = {}) {
     if (!targetElement) return;
     
-    const html = await fetch("src/components/score/score.html").then(function(res) { 
-        return res.text(); 
-    });
+    const html = `
+    <div class="score-container container">
+        <div id="searchbar-section"></div>
+        <div id="content-section">
+            <div id="search-guide" class="search-guide">
+                <div class="search-guide__content">
+                    <h2>전적 검색</h2>
+                    <p>검색창에 닉네임을 입력하여 전적을 확인하세요.</p>
+                </div>
+            </div>
+            <div id="record-section" class="record-section" style="display: none;"></div>
+        </div>
+    </div>
+    `;
     
-    const bodyContent = extractBodyContent(html);
-    targetElement.innerHTML = bodyContent;
+    targetElement.innerHTML = html;
     
     try {
         // 검색바 렌더링

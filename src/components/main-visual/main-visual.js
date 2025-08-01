@@ -11,12 +11,21 @@ function extractBodyContent(html) {
 export async function renderMainVisual(targetElement) {
     if (!targetElement) return;
     
-    const html = await fetch("src/components/main-visual/main-visual.html").then(function(res) { 
-        return res.text(); 
-    });
+    const html = `
+    <section class="main-visual">
+        <div class="main-visual__bg"></div>
+        <div class="visual container">
+            <img class="visual-img01" src="/images/visual-item01.png" alt="서든어택" />
+            <img class="visual-img02" src="/images/visual-item02.png" alt="오징어게임 시즌3" />
+            <p class="visual-text">
+                NETFLIX 오징어 게임 시즌3와의 콜라보레이션 2차 대공개!<br />
+                오징어 게임 캐릭터 세트와 스킨 무기, SP와 제작 재료 등 풍성한 보상 획득의 기회!
+            </p>
+        </div>
+    </section>
+    `;
     
-    const bodyContent = extractBodyContent(html);
-    targetElement.innerHTML = bodyContent;
+    targetElement.innerHTML = html;
     
     if (typeof gsap !== "undefined") {
         const tl = gsap.timeline({

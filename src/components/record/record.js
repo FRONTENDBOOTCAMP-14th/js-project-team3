@@ -4,23 +4,25 @@ import { renderScoreInfo } from "../score-info/score-info.js";
 import { renderScoreDetail } from "../score-detail/score-detail.js";
 import { renderTotalStatistics } from "../total-statistics/total-statistics.js";
 
-function extractBodyContent(html) {
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html;
-    const bodyElement = tempDiv.querySelector("body");
-    return bodyElement ? bodyElement.innerHTML : html;
-}
-
 export async function renderRecordComponents(userData) {
     const recordSection = document.getElementById("record-section");
     if (!recordSection) return;
     
-    const html = await fetch("src/components/record/record.html").then(function(res) { 
-        return res.text(); 
-    });
+    const html = `
+    <div class="record-container">
+        <section class="section-margin" id="searchbar-section"></section>
+        
+        <section class="section-margin" id="user-info-section"></section>
+        
+        <section class="section-margin" id="score-info-section"></section>
+        
+        <section class="section-margin" id="total-statistics-section"></section>
+        
+        <section class="section-margin" id="score-detail-section"></section>
+    </div>
+    `;
     
-    const bodyContent = extractBodyContent(html);
-    recordSection.innerHTML = bodyContent;
+    recordSection.innerHTML = html;
     
     try {
         console.log(`[RECORD] 렌더링 시작 - 받은 데이터:`, userData);
@@ -60,12 +62,21 @@ export async function renderRecordComponents(userData) {
 export async function renderRecordPage(targetElement) {
     if (!targetElement) return;
     
-    const html = await fetch("src/components/record/record.html").then(function(res) { 
-        return res.text(); 
-    });
+    const html = `
+    <div class="record-container">
+        <section class="section-margin" id="searchbar-section"></section>
+        
+        <section class="section-margin" id="user-info-section"></section>
+        
+        <section class="section-margin" id="score-info-section"></section>
+        
+        <section class="section-margin" id="total-statistics-section"></section>
+        
+        <section class="section-margin" id="score-detail-section"></section>
+    </div>
+    `;
     
-    const bodyContent = extractBodyContent(html);
-    targetElement.innerHTML = bodyContent;
+    targetElement.innerHTML = html;
     
     try {
         const userInfoSection = document.getElementById("user-info-section");

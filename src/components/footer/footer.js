@@ -1,15 +1,19 @@
 export async function renderFooter(targetElement) {
   if (!targetElement) return;
 
-  const html = await fetch("src/components/footer/footer.html").then(function (res) {
-    return res.text();
-  });
+  const html = `
+<footer>
+  <section class="footer-txt">
+    <h2>
+      본 사이트는 프론트엔드 부트캠프 과제제출용으로 제작되었으며,
+      <span>공식 서비스가 아닙니다.</span>
+    </h2>
+  </section>
+  <section class="footer-copyright">
+    <p>Copyright ⓒ 2025 3보급창고. All Right Reserved.</p>
+  </section>
+</footer>
+  `;
 
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-  const footerContent = doc.querySelector("footer");
-
-  if (footerContent) {
-    targetElement.innerHTML = footerContent.outerHTML;
-  }
+  targetElement.innerHTML = html;
 }

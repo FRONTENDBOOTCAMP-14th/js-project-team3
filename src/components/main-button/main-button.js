@@ -8,10 +8,9 @@ function extractBodyContent(html) {
 export async function renderMainButton(targetElement) {
     if (!targetElement) return;
     
-    const html = await fetch("src/components/main-button/main-button.html").then(function(res) { 
-        return res.text(); 
-    });
+    const html = `
+    <button class="main-button" onclick="window.routeTo('score')">Check Your Stats!</button>
+    `;
     
-    const bodyContent = extractBodyContent(html);
-    targetElement.innerHTML = bodyContent;
+    targetElement.innerHTML = html;
 } 

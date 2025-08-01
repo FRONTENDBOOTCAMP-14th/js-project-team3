@@ -238,7 +238,24 @@ async function initializeLiveList() {
 export async function renderLivePage(targetElement) {
     if (!targetElement) return;
     
-    const html = await fetch("src/components/live/live.html").then(function(res) { return res.text(); });
+    const html = `
+    <div class="container">
+      <div class="live-title-box">
+        <img class="live-title-box__chzzk" src="/images/chzzk-icon.png" alt=""/>
+        <h3 class="live-title-box__title">치지직 라이브</h3>
+      </div>
+
+      <div class="live-container"></div>
+
+      <div class="live-title-box">
+        <img class="live-title-box__youtube" src="/images/youtube-icon.png" alt=""/>
+        <h3 class="live-title-box__title">유튜브 라이브</h3>
+      </div>
+
+      <div class="youtube-live-container footer-margin"></div>
+    </div>
+    `;
+    
     targetElement.innerHTML = html;
     
     await initializeLiveList();

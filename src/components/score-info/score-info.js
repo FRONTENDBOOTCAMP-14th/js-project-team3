@@ -12,17 +12,16 @@ export async function renderScoreInfo(targetElement) {
     }
 
     try {
-        const response = await fetch("src/components/score-info/score-info.html");
+        const html = `
+        <div class="score-info container" role="alert" aria-label="매치 정보 알림">
+          <p class="score-info__text">
+            <strong class="score-info__text-bold">본 사이트는 바닐라프로젝트를 위한 테스트용 서버입니다.</strong><br />
+            최근 전적이 1,000경기를 넘는 경우 매치 정보가 표시되지 않으며, 금일 데이터는 조회되지 않습니다.
+          </p>
+        </div>
+        `;
         
-        if (!response.ok) {
-            throw new Error(`HTTP 오류! 상태: ${response.status}`);
-        }
-
-        const html = await response.text();
-        
-        const bodyContent = extractBodyContent(html);
-        
-        targetElement.innerHTML = bodyContent;
+        targetElement.innerHTML = html;
         console.log("score-info.html 내용이 성공적으로 렌더링되었습니다.");
 
     } catch (error) {

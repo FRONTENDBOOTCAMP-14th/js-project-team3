@@ -1,21 +1,393 @@
 /* eslint-disable no-console */
 
-function extractBodyContent(html) {
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html;
-    const bodyElement = tempDiv.querySelector("body");
-    return bodyElement ? bodyElement.innerHTML : html;
-}
-
 export async function renderTotalStatistics(targetElement) {
     if (!targetElement) return;
     
-    const html = await fetch("src/components/total-statistics/total-statistics.html").then(function(res) { 
-        return res.text(); 
-    });
+    const html = `
+    <main class="statistics container" role="main">
+      <header class="statistics-title">
+        <h2 class="statistics-title__text">전적 통계</h2>
+      </header>
+
+      <!-- PC 버전 -->
+      <section class="statistics-body web" aria-label="PC 버전 통계">
+        <!-- 일일 통계 섹션 -->
+        <section class="statistics-item" aria-labelledby="daily-stats-title">
+          <header class="item-title">
+            <h2 id="daily-stats-title" class="item-title__text">일일 통계</h2>
+          </header>
+          <div class="item-table" role="table" aria-label="일일 통계 데이터">
+            <!-- 헤더 행 -->
+            <div class="item-table__list" role="row">
+              <div class="record-list-item input-list-item" role="cell">
+                <img src="/icon/date.svg" alt="날짜 선택" class="icon-select-date" />
+                <span class="input-date-text">(오늘)</span>
+                <input type="date" class="input-item" tabindex="0" aria-label="일일 통계 날짜 선택" />
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_win_rate.svg" alt="전적 아이콘" class="icon-stat" />
+                <span class="record-label-text">전적</span>
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_score.svg" alt="킬데스 아이콘" class="icon-stat" />
+                <span class="record-label-text">킬데스</span>
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_dealing.svg" alt="어시스트 아이콘" class="icon-stat" />
+                <span class="record-label-text">어시스트</span>
+              </div>
+            </div>
+
+            <!-- 클랜전 데이터 행 -->
+            <div class="item-table__list" role="row">
+              <div class="record-list-item" role="rowheader">
+                <span class="record-label-text">클랜전</span>
+              </div>
+              <div class="record-list-item" data-mode="clan" data-type="win" role="cell" aria-label="클랜전 전적">
+                -
+              </div>
+              <div class="record-list-item" data-mode="clan" data-type="kd" role="cell" aria-label="클랜전 킬데스">
+                -
+              </div>
+              <div
+                class="record-list-item"
+                data-mode="clan"
+                data-type="assist"
+                role="cell"
+                aria-label="클랜전 어시스트"
+              >
+                -
+              </div>
+            </div>
+
+            <!-- 솔로 랭크 데이터 행 -->
+            <div class="item-table__list" role="row">
+              <div class="record-list-item" role="rowheader">
+                <span class="record-label-text">솔로 랭크</span>
+              </div>
+              <div class="record-list-item" data-mode="solo" data-type="win" role="cell" aria-label="솔로 랭크 전적">
+                -
+              </div>
+              <div class="record-list-item" data-mode="solo" data-type="kd" role="cell" aria-label="솔로 랭크 킬데스">
+                -
+              </div>
+              <div
+                class="record-list-item"
+                data-mode="solo"
+                data-type="assist"
+                role="cell"
+                aria-label="솔로 랭크 어시스트"
+              >
+                -
+              </div>
+            </div>
+
+            <!-- 파티 랭크 데이터 행 -->
+            <div class="item-table__list" role="row">
+              <div class="record-list-item" role="rowheader">
+                <span class="record-label-text">파티 랭크</span>
+              </div>
+              <div class="record-list-item" data-mode="party" data-type="win" role="cell" aria-label="파티 랭크 전적">
+                -
+              </div>
+              <div class="record-list-item" data-mode="party" data-type="kd" role="cell" aria-label="파티 랭크 킬데스">
+                -
+              </div>
+              <div
+                class="record-list-item"
+                data-mode="party"
+                data-type="assist"
+                role="cell"
+                aria-label="파티 랭크 어시스트"
+              >
+                -
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 일일 비교 섹션 -->
+        <section class="statistics-item" aria-labelledby="daily-compare-title">
+          <header class="item-title">
+            <h2 id="daily-compare-title" class="item-title__text">일일 비교</h2>
+          </header>
+          <div class="item-table" role="table" aria-label="일일 비교 데이터">
+            <!-- 필터 및 헤더 행 -->
+            <div class="item-table__list" role="row">
+              <div class="record-list-item match-type-list-item" role="cell">
+                <button
+                  class="match-type-selector"
+                  aria-expanded="false"
+                  aria-haspopup="listbox"
+                  aria-label="매치 타입 선택"
+                >
+                  <span class="match-type-label-text">전체</span>
+                  <img src="/icon/arrow.svg" alt="드롭다운 화살표" class="icon-menu" />
+                </button>
+                <ul class="match-type-list" role="listbox" aria-label="매치 타입 목록">
+                  <li class="match-item" role="option" tabindex="0">
+                    <span class="match-type-text">전체</span>
+                  </li>
+                  <li class="match-item" role="option" tabindex="0">
+                    <span class="match-type-text">클랜전</span>
+                  </li>
+                  <li class="match-item" role="option" tabindex="0">
+                    <span class="match-type-text">솔로 랭크</span>
+                  </li>
+                  <li class="match-item" role="option" tabindex="0">
+                    <span class="match-type-text">파티 랭크</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_win_rate.svg" alt="전적 아이콘" class="icon-stat" />
+                <span class="record-label-text">전적</span>
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_score.svg" alt="킬데스 아이콘" class="icon-stat" />
+                <span class="record-label-text">킬데스</span>
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_dealing.svg" alt="어시스트 아이콘" class="icon-stat" />
+                <span class="record-label-text">어시스트</span>
+              </div>
+            </div>
+
+            <!-- 첫 번째 날짜 데이터 행 -->
+            <div class="item-table__list" role="row">
+              <div class="record-list-item input-list-item" role="cell">
+                <img src="/icon/date.svg" alt="날짜 선택" class="icon-select-date" />
+                <span class="input-date-text">(어제)</span>
+                <input type="date" class="input-item" aria-label="비교 시작 날짜 선택" />
+              </div>
+              <div class="record-list-item" data-type="win" role="cell" aria-label="첫 번째 날짜 전적">-</div>
+              <div class="record-list-item" data-type="kd" role="cell" aria-label="첫 번째 날짜 킬데스">-</div>
+              <div class="record-list-item" data-type="assist" role="cell" aria-label="첫 번째 날짜 어시스트">-</div>
+            </div>
+
+            <!-- 비교 화살표 행 -->
+            <div class="item-table__list" role="row">
+              <div class="record-list-item" role="cell"></div>
+              <div class="record-list-item" role="cell">
+                <img src="/icon/arrow.svg" alt="비교 화살표" class="icon-arrow" />
+              </div>
+              <div class="record-list-item" role="cell">
+                <img src="/icon/arrow.svg" alt="비교 화살표" class="icon-arrow" />
+              </div>
+              <div class="record-list-item" role="cell">
+                <img src="/icon/arrow.svg" alt="비교 화살표" class="icon-arrow" />
+              </div>
+            </div>
+
+            <!-- 두 번째 날짜 데이터 행 -->
+            <div class="item-table__list" role="row">
+              <div class="record-list-item input-list-item" role="cell">
+                <img src="/icon/date.svg" alt="날짜 선택" class="icon-select-date" />
+                <span class="input-date-text">(오늘)</span>
+                <input type="date" class="input-item" aria-label="비교 종료 날짜 선택" />
+              </div>
+              <div class="record-list-item" data-type="win" role="cell" aria-label="두 번째 날짜 전적">-</div>
+              <div class="record-list-item" data-type="kd" role="cell" aria-label="두 번째 날짜 킬데스">-</div>
+              <div class="record-list-item" data-type="assist" role="cell" aria-label="두 번째 날짜 어시스트">-</div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- 모바일 버전 -->
+      <section class="statistics-body mobile" aria-label="모바일 버전 통계">
+        <!-- 모바일 일일 통계 섹션 -->
+        <section class="statistics-item" aria-labelledby="mobile-daily-stats-title">
+          <header class="item-title">
+            <h2 id="mobile-daily-stats-title" class="item-title__text">일일 통계</h2>
+          </header>
+          <div class="item-table" role="table" aria-label="모바일 일일 통계 데이터">
+            <!-- 날짜 선택 -->
+            <div class="item-table__list" role="row">
+              <div class="record-list-item input-list-item" role="cell">
+                <img src="/icon/date.svg" alt="날짜 선택" class="icon-select-date" />
+                <span class="input-date-text">(오늘)</span>
+                <input type="date" class="input-item" tabindex="0" aria-label="모바일 일일 통계 날짜 선택" />
+              </div>
+            </div>
+
+            <!-- 클랜전 섹션 -->
+            <div class="item-table__list" role="row">
+              <div class="record-list-item" role="rowheader">
+                <span class="record-label-text">클랜전</span>
+              </div>
+            </div>
+            <div class="item-table__list category" role="row">
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_win_rate.svg" alt="전적 아이콘" class="icon-stat" />
+                <span class="record-label-text">전적</span>
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_score.svg" alt="킬데스 아이콘" class="icon-stat" />
+                <span class="record-label-text">킬데스</span>
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_dealing.svg" alt="어시스트 아이콘" class="icon-stat" />
+                <span class="record-label-text">어시스트</span>
+              </div>
+            </div>
+            <div class="item-table__list value" role="row">
+              <div class="record-list-item" data-mode="clan" data-type="win" role="cell">-</div>
+              <div class="record-list-item" data-mode="clan" data-type="kd" role="cell">-</div>
+              <div class="record-list-item" data-mode="clan" data-type="assist" role="cell">-</div>
+            </div>
+
+            <!-- 솔로 랭크 섹션 -->
+            <div class="item-table__list" role="row">
+              <div class="record-list-item" role="rowheader">
+                <span class="record-label-text">솔로 랭크</span>
+              </div>
+            </div>
+            <div class="item-table__list category" role="row">
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_win_rate.svg" alt="전적 아이콘" class="icon-stat" />
+                <span class="record-label-text">전적</span>
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_score.svg" alt="킬데스 아이콘" class="icon-stat" />
+                <span class="record-label-text">킬데스</span>
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_dealing.svg" alt="어시스트 아이콘" class="icon-stat" />
+                <span class="record-label-text">어시스트</span>
+              </div>
+            </div>
+            <div class="item-table__list value" role="row">
+              <div class="record-list-item" data-mode="solo" data-type="win" role="cell">-</div>
+              <div class="record-list-item" data-mode="solo" data-type="kd" role="cell">-</div>
+              <div class="record-list-item" data-mode="solo" data-type="assist" role="cell">-</div>
+            </div>
+
+            <!-- 파티 랭크 섹션 -->
+            <div class="item-table__list" role="row">
+              <div class="record-list-item" role="rowheader">
+                <span class="record-label-text">파티 랭크</span>
+              </div>
+            </div>
+            <div class="item-table__list category" role="row">
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_win_rate.svg" alt="전적 아이콘" class="icon-stat" />
+                <span class="record-label-text">전적</span>
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_score.svg" alt="킬데스 아이콘" class="icon-stat" />
+                <span class="record-label-text">킬데스</span>
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_dealing.svg" alt="어시스트 아이콘" class="icon-stat" />
+                <span class="record-label-text">어시스트</span>
+              </div>
+            </div>
+            <div class="item-table__list value" role="row">
+              <div class="record-list-item" data-mode="party" data-type="win" role="cell">-</div>
+              <div class="record-list-item" data-mode="party" data-type="kd" role="cell">-</div>
+              <div class="record-list-item" data-mode="party" data-type="assist" role="cell">-</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 모바일 일일 비교 섹션 -->
+        <section class="statistics-item" aria-labelledby="mobile-daily-compare-title">
+          <header class="item-title">
+            <h2 id="mobile-daily-compare-title" class="item-title__text">일일 비교</h2>
+          </header>
+          <div class="item-table" role="table" aria-label="모바일 일일 비교 데이터">
+            <!-- 매치 타입 선택 -->
+            <div class="item-table__list" role="row">
+              <div class="record-list-item match-type-list-item" role="cell">
+                <button
+                  class="match-type-selector"
+                  aria-expanded="false"
+                  aria-haspopup="listbox"
+                  aria-label="모바일 매치 타입 선택"
+                >
+                  <span class="match-type-label-text">전체</span>
+                  <img src="/icon/arrow.svg" alt="드롭다운 화살표" class="icon-menu" />
+                </button>
+                <ul class="match-type-list" role="listbox" aria-label="모바일 매치 타입 목록">
+                  <li class="match-item" role="option" tabindex="0">
+                    <span class="match-type-text">전체</span>
+                  </li>
+                  <li class="match-item" role="option" tabindex="0">
+                    <span class="match-type-text">클랜전</span>
+                  </li>
+                  <li class="match-item" role="option" tabindex="0">
+                    <span class="match-type-text">솔로 랭크</span>
+                  </li>
+                  <li class="match-item" role="option" tabindex="0">
+                    <span class="match-type-text">파티 랭크</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- 첫 번째 날짜 섹션 -->
+            <div class="item-table__list" role="row">
+              <div class="record-list-item input-list-item" role="cell">
+                <img src="/icon/date.svg" alt="날짜 선택" class="icon-select-date" />
+                <span class="input-date-text">(어제)</span>
+                <input type="date" class="input-item" aria-label="모바일 비교 시작 날짜 선택" />
+              </div>
+            </div>
+            <div class="item-table__list category" role="row">
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_win_rate.svg" alt="전적 아이콘" class="icon-stat" />
+                <span class="record-label-text">전적</span>
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_score.svg" alt="킬데스 아이콘" class="icon-stat" />
+                <span class="record-label-text">킬데스</span>
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_dealing.svg" alt="어시스트 아이콘" class="icon-stat" />
+                <span class="record-label-text">어시스트</span>
+              </div>
+            </div>
+            <div class="item-table__list value" role="row">
+              <div class="record-list-item" data-type="win" role="cell">-</div>
+              <div class="record-list-item" data-type="kd" role="cell">-</div>
+              <div class="record-list-item" data-type="assist" role="cell">-</div>
+            </div>
+
+            <!-- 두 번째 날짜 섹션 -->
+            <div class="item-table__list" role="row">
+              <div class="record-list-item input-list-item" role="cell">
+                <img src="/icon/date.svg" alt="날짜 선택" class="icon-select-date" />
+                <span class="input-date-text">(오늘)</span>
+                <input type="date" class="input-item" aria-label="모바일 비교 종료 날짜 선택" />
+              </div>
+            </div>
+            <div class="item-table__list category" role="row">
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_win_rate.svg" alt="전적 아이콘" class="icon-stat" />
+                <span class="record-label-text">전적</span>
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_score.svg" alt="킬데스 아이콘" class="icon-stat" />
+                <span class="record-label-text">킬데스</span>
+              </div>
+              <div class="record-list-item" role="columnheader">
+                <img src="/icon/user_dealing.svg" alt="어시스트 아이콘" class="icon-stat" />
+                <span class="record-label-text">어시스트</span>
+              </div>
+            </div>
+            <div class="item-table__list value" role="row">
+              <div class="record-list-item" data-type="win" role="cell">-</div>
+              <div class="record-list-item" data-type="kd" role="cell">-</div>
+              <div class="record-list-item" data-type="assist" role="cell">-</div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+    `;
     
-    const bodyContent = extractBodyContent(html);
-    targetElement.innerHTML = bodyContent;
+    targetElement.innerHTML = html;
     
     // 기존 초기화 로직은 DOMContentLoaded 이벤트에서 처리됨
 }
