@@ -1,3 +1,21 @@
+import "./style.css";
+import "./components/header/header.css";
+import "./components/footer/footer.css";
+import "./components/news/news.css";
+import "./components/live/live.css";
+import "./components/home/home.css";
+import "./components/main-visual/main-visual.css";
+import "./components/team-introduction/team-introduction.css";
+import "./components/convention/convention.css";
+import "./components/main-button/main-button.css";
+import "./components/record/record.css";
+import "./components/searchbar/search-Bar.css";
+import "./components/userinfo/user-Info.css";
+import "./components/otherinfo/other-Info.css";
+import "./components/score-info/score-info.css";
+import "./components/total-statistics/total-statistics.css";
+import "./components/score-detail/score-detail.css";
+
 import { renderHeader } from "./components/header/header.js";
 import { renderFooter } from "./components/footer/footer.js";
 import { renderNewsPage } from "./components/news/news.js";
