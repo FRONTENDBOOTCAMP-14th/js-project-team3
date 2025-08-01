@@ -1,4 +1,4 @@
-import './other-info.css';
+import './other-Info.css';
 
 /**
  * 클랜, 랭크 등 기타 정보를 표시하는 카드 컴포넌트
