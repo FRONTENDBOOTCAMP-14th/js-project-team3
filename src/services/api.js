@@ -47,6 +47,10 @@ Nexon Open API 키는 https://openapi.nexon.com/ 에서 발급받을 수 있습�
             const queryString = new URLSearchParams(params).toString();
             const url = `${this.baseURL}/${endpoint}${queryString ? `?${queryString}` : ''}`;
             
+            console.log(`[API] 요청 URL: ${url}`);
+            console.log(`[API] 엔드포인트: ${endpoint}`);
+            console.log(`[API] 파라미터:`, params);
+            
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
@@ -54,12 +58,16 @@ Nexon Open API 키는 https://openapi.nexon.com/ 에서 발급받을 수 있습�
                 }
             });
 
+            console.log(`[API] 응답 상태: ${response.status}`);
+            
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
+                console.error(`[API] 응답 에러:`, errorData);
                 throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
             }
 
             const result = await response.json();
+            console.log(`[API] 응답 성공:`, result);
             
             if (!result.success) {
                 throw new Error(result.error || 'API 요청 실패');

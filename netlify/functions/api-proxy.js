@@ -57,6 +57,12 @@ class ApiKeyManager {
 
 // 요청 검증
 function validateRequest(event) {
+  console.log("=== 요청 검증 시작 ===");
+  console.log("event.path:", event.path);
+  console.log("event.rawPath:", event.rawPath);
+  console.log("event.queryStringParameters:", event.queryStringParameters);
+  console.log("event.multiValueQueryStringParameters:", event.multiValueQueryStringParameters);
+
   if (event.httpMethod === "OPTIONS") {
     return { isValid: true, isPreflight: true };
   }
@@ -68,10 +74,36 @@ function validateRequest(event) {
     };
   }
 
-  const path = event.path.replace("/.netlify/functions/api-proxy/", "");
+  // 경로 파싱 개선
+  let path;
+  if (event.rawPath) {
+    // Netlify Functions v2
+    path = event.rawPath.replace("/.netlify/functions/api-proxy", "");
+  } else {
+    // Netlify Functions v1
+    path = event.path.replace("/.netlify/functions/api-proxy/", "");
+  }
+  
+  console.log("파싱된 경로:", path);
+  
+  // 빈 경로 처리
+  if (!path || path === "/") {
+    return { 
+      isValid: false, 
+      error: { statusCode: 400, message: "Endpoint not specified" }
+    };
+  }
+  
+  // 앞의 슬래시 제거
+  path = path.replace(/^\/+/, "");
+  console.log("정리된 경로:", path);
+  
   const endpoint = path.split('/')[0];
+  console.log("엔드포인트:", endpoint);
   
   if (!API_ENDPOINTS[endpoint]) {
+    console.error("알 수 없는 엔드포인트:", endpoint);
+    console.error("사용 가능한 엔드포인트:", Object.keys(API_ENDPOINTS));
     return { 
       isValid: false, 
       error: { statusCode: 404, message: "Endpoint not found" }
@@ -238,12 +270,19 @@ async function callYoutubeApi(params) {
 exports.handler = async function (event, context) {
   console.log("--- Netlify API 프록시 실행 시작 ---");
   console.log("요청 경로:", event.path);
+  console.log("rawPath:", event.rawPath);
   console.log("HTTP 메서드:", event.httpMethod);
+  console.log("rawQuery:", event.rawQuery);
+  console.log("queryStringParameters:", event.queryStringParameters);
+
+  // 타임아웃 설정 (10초)
+  context.callbackWaitsForEmptyEventLoop = false;
 
   try {
     // 1. 요청 검증
     const validation = validateRequest(event);
     if (!validation.isValid) {
+      console.error("요청 검증 실패:", validation.error);
       return {
         statusCode: validation.error.statusCode,
         headers: corsHeaders,
@@ -263,7 +302,22 @@ exports.handler = async function (event, context) {
     }
 
     const { endpoint, path } = validation;
-    const queryParams = event.rawQuery || '';
+    
+    // 쿼리 파라미터 처리 개선
+    let queryParams = '';
+    if (event.rawQuery) {
+      queryParams = event.rawQuery;
+    } else if (event.queryStringParameters) {
+      const params = new URLSearchParams();
+      Object.entries(event.queryStringParameters).forEach(([key, value]) => {
+        params.append(key, value);
+      });
+      queryParams = params.toString();
+    }
+
+    console.log("엔드포인트:", endpoint);
+    console.log("경로:", path);
+    console.log("쿼리 파라미터:", queryParams);
 
     // 2. 라이브 API 처리
     if (endpoint === 'chzzk-lives') {
@@ -306,6 +360,16 @@ exports.handler = async function (event, context) {
 
     if (keyManager.getKeyCount() === 0) {
       console.error("치명적 오류: API 키가 서버에 설정되지 않았습니다.");
+      console.error("환경 변수 확인:");
+      console.error("- VITE_NEXON_OPEN_API_KEY1:", !!process.env.VITE_NEXON_OPEN_API_KEY1);
+      console.error("- VITE_NEXON_OPEN_API_KEY2:", !!process.env.VITE_NEXON_OPEN_API_KEY2);
+      console.error("- VITE_NEXON_OPEN_API_KEY3:", !!process.env.VITE_NEXON_OPEN_API_KEY3);
+      console.error("- VITE_NEXON_OPEN_API_KEY4:", !!process.env.VITE_NEXON_OPEN_API_KEY4);
+      console.error("- NEXON_OPEN_API_KEY1:", !!process.env.NEXON_OPEN_API_KEY1);
+      console.error("- NEXON_OPEN_API_KEY2:", !!process.env.NEXON_OPEN_API_KEY2);
+      console.error("- NEXON_OPEN_API_KEY3:", !!process.env.NEXON_OPEN_API_KEY3);
+      console.error("- NEXON_OPEN_API_KEY4:", !!process.env.NEXON_OPEN_API_KEY4);
+      
       return {
         statusCode: 500,
         headers: corsHeaders,
@@ -328,7 +392,10 @@ exports.handler = async function (event, context) {
     if (endpoint === 'ouid') {
       // OUID 조회는 특별 처리
       const nickname = new URLSearchParams(queryParams).get('nickname');
+      console.log("닉네임:", nickname);
+      
       if (!nickname) {
+        console.error("닉네임 파라미터 누락");
         return {
           statusCode: 400,
           headers: corsHeaders,
@@ -342,7 +409,10 @@ exports.handler = async function (event, context) {
     } else {
       // 나머지 엔드포인트는 OUID 기반
       const ouid = new URLSearchParams(queryParams).get('ouid');
+      console.log("OUID:", ouid);
+      
       if (!ouid && endpoint !== 'match') {
+        console.error("OUID 파라미터 누락");
         return {
           statusCode: 400,
           headers: corsHeaders,
@@ -367,20 +437,38 @@ exports.handler = async function (event, context) {
     console.log("최종 요청 URL:", apiUrl);
 
     // 6. Nexon API 호출
-    const data = await callNexonApi(apiUrl, apiKey);
-    console.log("--- Netlify API 프록시 실행 종료 (성공) ---");
-    
-    return {
-      statusCode: 200,
-      headers: corsHeaders,
-      body: JSON.stringify({
-        success: true,
-        data: data
-      })
-    };
+    try {
+      const data = await callNexonApi(apiUrl, apiKey);
+      console.log("API 응답 성공");
+      console.log("--- Netlify API 프록시 실행 종료 (성공) ---");
+      
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({
+          success: true,
+          data: data
+        })
+      };
+    } catch (apiError) {
+      console.error("Nexon API 호출 실패:", apiError.message);
+      console.error("API URL:", apiUrl);
+      console.error("API 키 (앞 8자리):", apiKey.substring(0, 8) + "...");
+      
+      return {
+        statusCode: 500,
+        headers: corsHeaders,
+        body: JSON.stringify({
+          success: false,
+          error: "Nexon API 호출 실패",
+          details: apiError.message
+        })
+      };
+    }
 
   } catch (error) {
-    console.error("[API 프록시] 오류:", error.message);
+    console.error("[API 프록시] 예상치 못한 오류:", error.message);
+    console.error("스택 트레이스:", error.stack);
     console.log("--- Netlify API 프록시 실행 종료 (실패) ---");
     
     return {

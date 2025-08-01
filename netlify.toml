@@ -6,11 +6,13 @@
 [build.environment]
   NODE_VERSION = "18"
 
+# API 프록시 리다이렉트
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  from = "/.netlify/functions/api-proxy/*"
+  to = "/.netlify/functions/api-proxy/:splat"
   status = 200
 
+# SPA 리다이렉트
 [[redirects]]
   from = "/*"
   to = "/index.html"
