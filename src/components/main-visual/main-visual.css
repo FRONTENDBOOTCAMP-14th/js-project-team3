@@ -40,23 +40,33 @@
     height: 600px;
     align-items: flex-start;
   }
+}
 
+@media (max-width: 768px) {
   .visual {
     margin-top: 60px;
   }
+}
 
+@media (max-width: 768px) {
   .main-visual__bg {
     background-image: url("/images/visual-mobile.png");
   }
+}
 
+@media (max-width: 768px) {
   .visual-img01 {
     width: 16rem;
   }
+}
 
+@media (max-width: 768px) {
   .visual-img02 {
     width: 26rem;
   }
+}
 
+@media (max-width: 768px) {
   .visual-text {
     font-size: 1rem;
     margin-top: 1.5rem;
