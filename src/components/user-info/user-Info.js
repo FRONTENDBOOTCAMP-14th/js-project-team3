@@ -41,7 +41,7 @@ export function UserInfo(targetElement, props) {
     const gradeImage = state.activeTab === "total" ? total_grade_Response.find((grade) => grade.grade === userRankInfo.grade)?.grade_image : season_grade_Response.find((grade) => grade.season_grade === userRankInfo.season_grade)?.season_grade_image;
 
     targetElement.innerHTML = `
-    <div class="container user-info">
+    <div class="user-info">
       <div class="user-profile-container">
         <div class="user-profile">
           <div class="user-profile__header">
