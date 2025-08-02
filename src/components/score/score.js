@@ -14,17 +14,19 @@ function extractBodyContent(html) {
 // 화면 크기에 따라 이미지 변경
 function updateImagesForScreenSize() {
   const isMobile = window.innerWidth <= 768;
-  
+
   // 검색 가이드 이미지 변경
-  const searchGuideImg = document.querySelector('.search-guide img');
+  const searchGuideImg = document.querySelector(".search-guide img");
   if (searchGuideImg) {
-    searchGuideImg.src = isMobile ? '/images/search-guide-mobile.png' : '/images/search-guide-pc.png';
+    searchGuideImg.src = isMobile ? "/images/search-guide-mobile.png" : "/images/search-guide-pc.png";
   }
-  
+
   // 노리설트 이미지 변경
-  const noResultsImg = document.querySelector('.no-results img');
+  const noResultsImg = document.querySelector(".no-results img");
   if (noResultsImg) {
-    noResultsImg.src = isMobile ? '/images/search-guide--no-result-mobile.png' : '/images/search-guide-no-result-pc.png';
+    noResultsImg.src = isMobile
+      ? "/images/search-guide--no-result-mobile.png"
+      : "/images/search-guide-no-result-pc.png";
   }
 }
 
@@ -134,7 +136,7 @@ function showNoResults() {
 
     // 화면 크기에 따라 이미지 결정
     const isMobile = window.innerWidth <= 768;
-    const imageSrc = isMobile ? '/images/search-guide--no-result-mobile.png' : '/images/search-guide-no-result-pc.png';
+    const imageSrc = isMobile ? "/images/search-guide--no-result-mobile.png" : "/images/search-guide-no-result-pc.png";
 
     // 결과 없음 메시지 생성
     const noResultsMessage = document.createElement("div");
@@ -202,89 +204,84 @@ async function searchAndRenderUser(nickname) {
     };
 
     try {
-        if (!nickname || nickname.trim() === "") {
-            showError("유효한 닉네임을 입력해주세요.");
-            return;
-        }
-        
-        showLoading();
-        
-        // 1. 닉네임으로 OUID 조회
-        const ouidResponse = await apiService.getOuidByNickname(nickname);
-        
-        if (!ouidResponse.success || !ouidResponse.data || !ouidResponse.data.ouid) {
-            hideLoading();
-            showNoResults();
-            return;
-        }
+      if (!nickname || nickname.trim() === "") {
+        showError("유효한 닉네임을 입력해주세요.");
+        return;
+      }
 
-        addRecentSearch(nickname);
-        
-        const ouid = ouidResponse.data.ouid;
-        
-        // 2. 사용자 기본 정보 조회
-        const userInfo = await apiService.getUserInfo(ouid);
-        
-        if (!userInfo.success || !userInfo.data) {
-            hideLoading();
-            showNoResults();
-            return;
-        }
-        
-        // 3. 매치 목록 조회
-        const matchList = await apiService.getMatchList(ouid, "폭파미션", "일반전");
-        
-        // 4. 나머지 사용자 데이터 병렬로 조회 (에러가 나도 계속 진행)
-        const [
-            userStats,
-            userTier,
-            userRecentInfo
-        ] = await Promise.allSettled([
-            apiService.getUserStats(ouid),
-            apiService.getUserTier(ouid),
-            apiService.getUserRecentInfo(ouid)
-        ]);
-        
-        // 5. Record 컴포넌트들 렌더링 (성공한 데이터만 사용)
-        const renderData = {
-            userInfo: {
-                basicInfo: userInfo.data,
-                rankInfo: userTier.status === "fulfilled" ? userTier.value?.data : null,
-                recentInfo: userRecentInfo.status === "fulfilled" ? userRecentInfo.value?.data : null
-            },
-            userStats: userStats.status === "fulfilled" ? userStats.value?.data : null,
-            userTier: userTier.status === "fulfilled" ? userTier.value?.data : null,
-            userRecentInfo: userRecentInfo.status === "fulfilled" ? userRecentInfo.value?.data : null,
-            matchList: matchList.success ? matchList.data : null
-        };
-        
-        try {
-            await renderRecordComponents(renderData);
-            hideLoading();
-            showRecordSection();
+      showLoading();
 
-            // 전적 갱신 버튼에 이벤트 리스너 추가
-            const refreshButton = document.querySelector(".user-profile__header__right__refresh-button");
-            if (refreshButton) {
-                refreshButton.addEventListener('click', async () => {
-                    // 버튼 비활성화 및 텍스트 변경
-                    refreshButton.disabled = true;
-                    refreshButton.textContent = '갱신 중...';
-                    
-                    // 동일한 닉네임으로 데이터 다시 검색 및 렌더링
-                    await searchAndRenderUser(nickname);
-                });
-            }
-        } catch (renderError) {
-            console.error(`[SCORE] Record 컴포넌트 렌더링 실패:`, renderError);
-            hideLoading();
-            showError(`렌더링 중 오류가 발생했습니다: ${renderError.message}`);
-        }
-        
-    } catch (error) {
-        console.error("[SCORE] 사용자 검색 실패:", error);
+      // 1. 닉네임으로 OUID 조회
+      const ouidResponse = await apiService.getOuidByNickname(nickname);
+
+      if (!ouidResponse.success || !ouidResponse.data || !ouidResponse.data.ouid) {
         hideLoading();
         showNoResults();
+        return;
+      }
+
+      addRecentSearch(nickname);
+
+      const ouid = ouidResponse.data.ouid;
+
+      // 2. 사용자 기본 정보 조회
+      const userInfo = await apiService.getUserInfo(ouid);
+
+      if (!userInfo.success || !userInfo.data) {
+        hideLoading();
+        showNoResults();
+        return;
+      }
+
+      // 3. 매치 목록 조회
+      const matchList = await apiService.getMatchList(ouid, "폭파미션", "일반전");
+
+      // 4. 나머지 사용자 데이터 병렬로 조회 (에러가 나도 계속 진행)
+      const [userStats, userTier, userRecentInfo] = await Promise.allSettled([
+        apiService.getUserStats(ouid),
+        apiService.getUserTier(ouid),
+        apiService.getUserRecentInfo(ouid),
+      ]);
+
+      // 5. Record 컴포넌트들 렌더링 (성공한 데이터만 사용)
+      const renderData = {
+        userInfo: {
+          basicInfo: userInfo.data,
+          rankInfo: userTier.status === "fulfilled" ? userTier.value?.data : null,
+          recentInfo: userRecentInfo.status === "fulfilled" ? userRecentInfo.value?.data : null,
+        },
+        userStats: userStats.status === "fulfilled" ? userStats.value?.data : null,
+        userTier: userTier.status === "fulfilled" ? userTier.value?.data : null,
+        userRecentInfo: userRecentInfo.status === "fulfilled" ? userRecentInfo.value?.data : null,
+        matchList: matchList.success ? matchList.data : null,
+      };
+
+      try {
+        await renderRecordComponents(renderData);
+        hideLoading();
+        showRecordSection();
+
+        // 전적 갱신 버튼에 이벤트 리스너 추가
+        const refreshButton = document.querySelector(".user-profile__header__right__refresh-button");
+        if (refreshButton) {
+          refreshButton.addEventListener("click", async () => {
+            // 버튼 비활성화 및 텍스트 변경
+            refreshButton.disabled = true;
+            refreshButton.textContent = "갱신 중...";
+
+            // 동일한 닉네임으로 데이터 다시 검색 및 렌더링
+            await searchAndRenderUser(nickname);
+          });
+        }
+      } catch (renderError) {
+        console.error(`[SCORE] Record 컴포넌트 렌더링 실패:`, renderError);
+        hideLoading();
+        showError(`렌더링 중 오류가 발생했습니다: ${renderError.message}`);
+      }
+    } catch (error) {
+      console.error("[SCORE] 사용자 검색 실패:", error);
+      hideLoading();
+      showNoResults();
     }
   } catch (error) {
     console.error("[SCORE] 사용자 검색 실패:", error);
@@ -335,7 +332,7 @@ export async function renderScorePage(targetElement, params = {}) {
     updateImagesForScreenSize();
 
     // 리사이즈 이벤트 리스너 추가
-    window.addEventListener('resize', updateImagesForScreenSize);
+    window.addEventListener("resize", updateImagesForScreenSize);
 
     console.log("Score 페이지 렌더링 완료");
   } catch (error) {
