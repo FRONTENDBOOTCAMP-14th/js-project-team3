@@ -235,10 +235,11 @@ async function callChzzkApi(params) {
       throw new Error(`치지직 API 오류: ${responseData.message || responseData.code}`);
     }
 
-    // 응답 데이터를 클라이언트가 기대하는 형태로 변환
+        // 응답 데이터를 클라이언트가 기대하는 형태로 변환
+    // 치지직 API 응답 구조: {content: {data: Array, page: Object}, next: null}
     const transformedData = {
-      content: responseData.content || [],
-      next: responseData.next || null
+        content: responseData.content?.data || responseData.content || [],
+        next: responseData.next || responseData.content?.page?.next || null
     };
 
     // 각 라이브 항목을 클라이언트가 기대하는 형태로 변환
