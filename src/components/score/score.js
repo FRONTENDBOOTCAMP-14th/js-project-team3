@@ -11,6 +11,23 @@ function extractBodyContent(html) {
   return bodyElement ? bodyElement.innerHTML : html;
 }
 
+// 화면 크기에 따라 이미지 변경
+function updateImagesForScreenSize() {
+  const isMobile = window.innerWidth <= 768;
+  
+  // 검색 가이드 이미지 변경
+  const searchGuideImg = document.querySelector('.search-guide img');
+  if (searchGuideImg) {
+    searchGuideImg.src = isMobile ? '/images/search-guide-mobile.png' : '/images/search-guide-pc.png';
+  }
+  
+  // 노리설트 이미지 변경
+  const noResultsImg = document.querySelector('.no-results img');
+  if (noResultsImg) {
+    noResultsImg.src = isMobile ? '/images/search-guide--no-result-mobile.png' : '/images/search-guide-no-result-pc.png';
+  }
+}
+
 // 검색 가이드 표시
 function showSearchGuide() {
   const searchGuide = document.getElementById("search-guide");
@@ -115,9 +132,18 @@ function showNoResults() {
       searchGuide.style.display = "none";
     }
 
+    // 화면 크기에 따라 이미지 결정
+    const isMobile = window.innerWidth <= 768;
+    const imageSrc = isMobile ? '/images/search-guide--no-result-mobile.png' : '/images/search-guide-no-result-pc.png';
+
     // 결과 없음 메시지 생성
     const noResultsMessage = document.createElement("div");
     noResultsMessage.className = "no-results";
+    noResultsMessage.innerHTML = `
+      <div role="img" aria-label="검색 결과가 없습니다. 다른 닉네임으로 검색해보세요.">
+        <img src="${imageSrc}" alt="검색 결과 없음" />
+      </div>
+    `;
     contentSection.appendChild(noResultsMessage);
   }
 }
@@ -278,6 +304,7 @@ export async function renderScorePage(targetElement, params = {}) {
                  class="search-guide" 
                  role="img" 
                  aria-label="GGATTACK 전적 검색. 검색창에 유저 닉네임을 입력해주세요. 최근 전적이 1,000경기를 넘는 경우 마지막 전적이 표시되지 않으며, 금일 데이터는 조회되지 않습니다.">
+                <img src="/images/search-guide-pc.png" alt="GGATTACK 전적 검색 가이드" />
             </div>
             <div id="record-section" class="record-section" style="display: none;"></div>
         </div>
@@ -303,6 +330,12 @@ export async function renderScorePage(targetElement, params = {}) {
       // 검색어가 없으면 가이드 표시
       showSearchGuide();
     }
+
+    // 초기 이미지 설정
+    updateImagesForScreenSize();
+
+    // 리사이즈 이벤트 리스너 추가
+    window.addEventListener('resize', updateImagesForScreenSize);
 
     console.log("Score 페이지 렌더링 완료");
   } catch (error) {

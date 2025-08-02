@@ -59,15 +59,30 @@ async function fetchLiveList(size = 20, next = null) {
                 
                 const responseData = await response.json();
                 
+                // 치지직 API 응답 구조 디버깅
+                console.log("치지직 API 원본 응답:", responseData);
+                console.log("치지직 API 응답 구조 분석:", {
+                    hasContent: !!responseData.content,
+                    contentType: typeof responseData.content,
+                    hasContentData: !!responseData.content?.data,
+                    contentDataLength: responseData.content?.data ? responseData.content.data.length : 0,
+                    hasCode: !!responseData.code,
+                    code: responseData.code,
+                    hasMessage: !!responseData.message,
+                    message: responseData.message,
+                    sampleItem: responseData.content?.data?.[0] || responseData.content?.[0] || null
+                });
+                
                 // 치지직 API 응답 구조 확인 및 변환
                 if (responseData.code && responseData.code !== "SUCCESS") {
                     throw new Error(`치지직 API 오류: ${responseData.message || responseData.code}`);
                 }
                 
                 // 응답 데이터를 클라이언트가 기대하는 형태로 변환
+                // 치지직 API 응답 구조: {content: {data: Array, page: Object}, next: null}
                 const transformedData = {
-                    content: responseData.content || [],
-                    next: responseData.next || null
+                    content: responseData.content?.data || responseData.content || [],
+                    next: responseData.next || responseData.content?.page?.next || null
                 };
                 
                 // 각 라이브 항목을 클라이언트가 기대하는 형태로 변환
@@ -333,6 +348,7 @@ async function initializeLiveList() {
             sampleItem: chzzkResult.content[0]
         });
         
+        // GAME 카테고리만 필터링
         const chzzkGameLives = chzzkResult.content.filter(function(live) { 
             return live.categoryType === "GAME"; 
         });
