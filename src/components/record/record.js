@@ -52,7 +52,7 @@ export async function renderRecordComponents(userData) {
     const userInfoSection = document.getElementById("user-info-section");
     if (userInfoSection) {
       try {
-        UserInfo(userInfoSection, { data: userData.userInfo || null });
+        UserInfo(userInfoSection, { data: userData || null });
       } catch (error) {
         console.error(`[RECORD] UserInfo 컴포넌트 렌더링 실패:`, error);
       }
