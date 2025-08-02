@@ -92,7 +92,7 @@ export async function renderRecordComponents(userData) {
     const scoreDetailSection = document.getElementById("score-detail-section");
     if (scoreDetailSection) {
       try {
-        await renderScoreDetail(scoreDetailSection, { matchList: userData.matchList });
+        await renderScoreDetail(scoreDetailSection, { matchList: userData.matchList, userOuid: userData.userOuid, nickname: userData.nickname });
       } catch (error) {
         console.error(`[RECORD] ScoreDetail 컴포넌트 렌더링 실패:`, error);
       }
@@ -157,7 +157,7 @@ export async function renderRecordPage(targetElement, userData = null) {
 
     const scoreDetailSection = document.getElementById("score-detail-section");
     if (scoreDetailSection) {
-      await renderScoreDetail(scoreDetailSection);
+      await renderScoreDetail(scoreDetailSection, { matchList: userData.matchList });
     }
 
     console.log("전적 페이지 렌더링 완료");

@@ -5,6 +5,7 @@ class ApiService {
   constructor() {
     this.baseURL = API_BASE_URL;
     this.isDevelopment = import.meta.env.DEV;
+    this.apiKeyIndex = 0; // API 키 순환을 위한 인덱스
 
     // 초기화 시 API 키 상태 확인 (개발 환경에서만)
     if (this.isDevelopment) {
@@ -123,7 +124,9 @@ Nexon Open API 키는 https://openapi.nexon.com/ 에서 발급받을 수 있습�
       return null;
     }
 
-    return apiKeys[Math.floor(Math.random() * apiKeys.length)];
+    const key = apiKeys[this.apiKeyIndex];
+    this.apiKeyIndex = (this.apiKeyIndex + 1) % apiKeys.length; // 인덱스를 순환시킴
+    return key;
   }
 
   // 닉네임으로 OUID 조회

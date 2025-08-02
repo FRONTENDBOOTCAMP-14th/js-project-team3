@@ -220,46 +220,52 @@ async function searchAndRenderUser(nickname) {
         return;
       }
 
-      addRecentSearch(nickname);
-
-      const ouid = ouidResponse.data.ouid;
-
-      // 2. 사용자 기본 정보 조회
-      const userInfo = await apiService.getUserInfo(ouid);
-
-      if (!userInfo.success || !userInfo.data) {
-        hideLoading();
-        showNoResults();
-        return;
-      }
-
-      // 3. 매치 목록 조회
-      const matchList = await apiService.getMatchList(ouid, "폭파미션", "일반전");
-
-      // 4. 나머지 사용자 데이터 병렬로 조회 (에러가 나도 계속 진행)
-      const [userStats, userTier, userRecentInfo] = await Promise.allSettled([
-        apiService.getUserStats(ouid),
-        apiService.getUserTier(ouid),
-        apiService.getUserRecentInfo(ouid),
-      ]);
-
-      // 5. Record 컴포넌트들 렌더링 (성공한 데이터만 사용)
-      const renderData = {
-        userInfo: {
-          basicInfo: userInfo.data,
-          rankInfo: userTier.status === "fulfilled" ? userTier.value?.data : null,
-          recentInfo: userRecentInfo.status === "fulfilled" ? userRecentInfo.value?.data : null,
-        },
-        userStats: userStats.status === "fulfilled" ? userStats.value?.data : null,
-        userTier: userTier.status === "fulfilled" ? userTier.value?.data : null,
-        userRecentInfo: userRecentInfo.status === "fulfilled" ? userRecentInfo.value?.data : null,
-        matchList: matchList.success ? matchList.data : null,
-      };
-
-      try {
-        await renderRecordComponents(renderData);
-        hideLoading();
-        showRecordSection();
+        addRecentSearch(nickname);
+        
+        const ouid = ouidResponse.data.ouid;
+        
+        // 2. 사용자 기본 정보 조회
+        const userInfo = await apiService.getUserInfo(ouid);
+        
+        if (!userInfo.success || !userInfo.data) {
+            hideLoading();
+            showNoResults();
+            return;
+        }
+        
+        // 3. 매치 목록 조회
+        const matchList = await apiService.getMatchList(ouid, "폭파미션", "일반전");
+        
+        // 4. 나머지 사용자 데이터 병렬로 조회 (에러가 나도 계속 진행)
+        const [
+            userStats,
+            userTier,
+            userRecentInfo
+        ] = await Promise.allSettled([
+            apiService.getUserStats(ouid),
+            apiService.getUserTier(ouid),
+            apiService.getUserRecentInfo(ouid)
+        ]);
+        
+        // 5. Record 컴포넌트들 렌더링 (성공한 데이터만 사용)
+        const renderData = {
+            userInfo: {
+                basicInfo: userInfo.data,
+                rankInfo: userTier.status === "fulfilled" ? userTier.value?.data : null,
+                recentInfo: userRecentInfo.status === "fulfilled" ? userRecentInfo.value?.data : null
+            },
+            userStats: userStats.status === "fulfilled" ? userStats.value?.data : null,
+            userTier: userTier.status === "fulfilled" ? userTier.value?.data : null,
+            userRecentInfo: userRecentInfo.status === "fulfilled" ? userRecentInfo.value?.data : null,
+            matchList: matchList.success ? matchList.data : null,
+            userOuid: ouid,
+            nickname: nickname
+        };
+        
+        try {
+            await renderRecordComponents(renderData);
+            hideLoading();
+            showRecordSection();
 
         // 전적 갱신 버튼에 이벤트 리스너 추가
         const refreshButton = document.querySelector(".user-profile__header__right__refresh-button");
