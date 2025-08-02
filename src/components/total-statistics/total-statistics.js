@@ -50,10 +50,28 @@ function filterValidMatchTypes(matches) {
   return matches.filter((match) => validTypes.includes(match.match_type));
 }
 
+// 🔥 날짜 포맷팅 함수 (YYYY-MM-DD를 한국어 형식으로)
+function formatDateDisplay(dateString) {
+  if (!dateString) return "";
+  const [year, month, day] = dateString.split("-");
+  return `${year}.${month}.${day}`;
+}
+
+// 🔥 날짜 제한 설정 함수
+function setDateInputLimits(input) {
+  if (!input) return;
+
+  // 🔥 최신 데이터가 1일전까지만 있으므로 어제까지만 선택 가능
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+
+  // 🔥 최대 날짜를 어제로 설정 (최소 날짜 제한 없음)
+  input.setAttribute("max", yesterday);
+}
+
 // HTML 템플릿 생성 함수
 function createStatisticsTemplate() {
   return `
-    <main class="statistics container" role="main">
+    <main class="statistics" role="main">
       <header class="statistics-title">
         <h2 class="statistics-title__text">전적 통계</h2>
       </header>
@@ -68,7 +86,7 @@ function createStatisticsTemplate() {
           <div class="item-table" role="table" aria-label="일일 통계 데이터">
             <!-- 헤더 행 -->
             <div class="item-table__list" role="row">
-              <div class="record-list-item input-list-item" role="cell">
+              <div class="record-list-item input-list-item" role="cell" data-date-display="">
                 <img src="/icon/date.svg" alt="날짜 선택" class="icon-select-date" />
                 <span class="input-date-text">(오늘)</span>
                 <input type="date" class="input-item" tabindex="0" aria-label="일일 통계 날짜 선택" />
@@ -146,10 +164,8 @@ function createStatisticsTemplate() {
             <!-- 필터 및 헤더 행 -->
             <div class="item-table__list" role="row">
               <div class="record-list-item match-type-list-item" role="cell">
-                <button class="match-type-selector" aria-expanded="false" aria-haspopup="listbox" aria-label="매치 타입 선택">
-                  <span class="match-type-label-text">전체</span>
-                  <img src="/icon/arrow.svg" alt="드롭다운 화살표" class="icon-menu" />
-                </button>
+                <span class="match-type-label-text">전체</span>
+                <img src="/icon/arrow.svg" alt="드롭다운 화살표" class="icon-menu" />
                 <ul class="match-type-list" role="listbox" aria-label="매치 타입 목록">
                   <li class="match-item" role="option" tabindex="0">
                     <span class="match-type-text">전체</span>
@@ -181,7 +197,7 @@ function createStatisticsTemplate() {
 
             <!-- 첫 번째 날짜 데이터 행 -->
             <div class="item-table__list" role="row">
-              <div class="record-list-item input-list-item" role="cell">
+              <div class="record-list-item input-list-item" role="cell" data-date-display="">
                 <img src="/icon/date.svg" alt="날짜 선택" class="icon-select-date" />
                 <span class="input-date-text">(어제)</span>
                 <input type="date" class="input-item" aria-label="비교 시작 날짜 선택" />
@@ -207,7 +223,7 @@ function createStatisticsTemplate() {
 
             <!-- 두 번째 날짜 데이터 행 -->
             <div class="item-table__list" role="row">
-              <div class="record-list-item input-list-item" role="cell">
+              <div class="record-list-item input-list-item" role="cell" data-date-display="">
                 <img src="/icon/date.svg" alt="날짜 선택" class="icon-select-date" />
                 <span class="input-date-text">(오늘)</span>
                 <input type="date" class="input-item" aria-label="비교 종료 날짜 선택" />
@@ -230,7 +246,7 @@ function createStatisticsTemplate() {
           <div class="item-table" role="table" aria-label="모바일 일일 통계 데이터">
             <!-- 날짜 선택 -->
             <div class="item-table__list" role="row">
-              <div class="record-list-item input-list-item" role="cell">
+              <div class="record-list-item input-list-item" role="cell" data-date-display="">
                 <img src="/icon/date.svg" alt="날짜 선택" class="icon-select-date" />
                 <span class="input-date-text">(오늘)</span>
                 <input type="date" class="input-item" tabindex="0" aria-label="모바일 일일 통계 날짜 선택" />
@@ -326,10 +342,8 @@ function createStatisticsTemplate() {
             <!-- 매치 타입 선택 -->
             <div class="item-table__list" role="row">
               <div class="record-list-item match-type-list-item" role="cell">
-                <button class="match-type-selector" aria-expanded="false" aria-haspopup="listbox" aria-label="모바일 매치 타입 선택">
-                  <span class="match-type-label-text">전체</span>
-                  <img src="/icon/arrow.svg" alt="드롭다운 화살표" class="icon-menu" />
-                </button>
+                <span class="match-type-label-text">전체</span>
+                <img src="/icon/arrow.svg" alt="드롭다운 화살표" class="icon-menu" />
                 <ul class="match-type-list" role="listbox" aria-label="모바일 매치 타입 목록">
                   <li class="match-item" role="option" tabindex="0">
                     <span class="match-type-text">전체</span>
@@ -349,7 +363,7 @@ function createStatisticsTemplate() {
 
             <!-- 첫 번째 날짜 섹션 -->
             <div class="item-table__list" role="row">
-              <div class="record-list-item input-list-item" role="cell">
+              <div class="record-list-item input-list-item" role="cell" data-date-display="">
                 <img src="/icon/date.svg" alt="날짜 선택" class="icon-select-date" />
                 <span class="input-date-text">(어제)</span>
                 <input type="date" class="input-item" aria-label="모바일 비교 시작 날짜 선택" />
@@ -377,7 +391,7 @@ function createStatisticsTemplate() {
 
             <!-- 두 번째 날짜 섹션 -->
             <div class="item-table__list" role="row">
-              <div class="record-list-item input-list-item" role="cell">
+              <div class="record-list-item input-list-item" role="cell" data-date-display="">
                 <img src="/icon/date.svg" alt="날짜 선택" class="icon-select-date" />
                 <span class="input-date-text">(오늘)</span>
                 <input type="date" class="input-item" aria-label="모바일 비교 종료 날짜 선택" />
@@ -409,6 +423,14 @@ function createStatisticsTemplate() {
   `;
 }
 
+// 🔥 날짜 표시 업데이트 함수
+function updateDateDisplay(item, dateValue) {
+  if (item && dateValue) {
+    const formattedDate = formatDateDisplay(dateValue);
+    item.setAttribute("data-date-display", formattedDate);
+  }
+}
+
 // UI 동기화 함수들
 function syncDailyDateUI() {
   const devices = ["web", "mobile"];
@@ -424,6 +446,8 @@ function syncDailyDateUI() {
       if (input && text) {
         input.value = dailyState.date;
         text.textContent = getDateText(dailyState.date);
+        // 🔥 날짜 표시 업데이트
+        updateDateDisplay(item, dailyState.date);
       }
     });
   });
@@ -454,9 +478,13 @@ function syncComparisonDateUI() {
       if (dateIndex === 0) {
         input.value = compareState.startDate;
         text.textContent = getDateText(compareState.startDate);
+        // 🔥 날짜 표시 업데이트
+        updateDateDisplay(item, compareState.startDate);
       } else if (dateIndex === 1) {
         input.value = compareState.endDate;
         text.textContent = getDateText(compareState.endDate);
+        // 🔥 날짜 표시 업데이트
+        updateDateDisplay(item, compareState.endDate);
       }
     });
   });
@@ -745,7 +773,7 @@ function updateDailyComparison(matchData) {
   }
 }
 
-// 이벤트 리스너 설정
+// 🔥 이벤트 리스너 설정 (날짜 제한 포함)
 function setupDailyDateEvents(matchData) {
   const devices = ["web", "mobile"];
 
@@ -761,21 +789,54 @@ function setupDailyDateEvents(matchData) {
 
       input.value = dailyState.date;
       text.textContent = getDateText(dailyState.date);
+      // 🔥 초기 날짜 표시 설정
+      updateDateDisplay(item, dailyState.date);
+      // 🔥 날짜 제한 설정 추가 (최대 어제까지만)
+      setDateInputLimits(input);
 
-      // 클릭 이벤트
+      // 🔥 클릭 이벤트 수정 - 전체 영역 클릭 처리
       item.addEventListener("click", (e) => {
-        if (e.target !== input) {
-          if (input.showPicker) {
-            input.showPicker();
-          } else {
-            input.click();
-          }
+        e.preventDefault();
+        e.stopPropagation();
+
+        // 🔥 input을 임시로 보이게 만들고 날짜 선택기 열기
+        input.style.opacity = "1";
+        input.style.pointerEvents = "auto";
+        input.style.zIndex = "10";
+
+        if (input.showPicker) {
+          input.showPicker();
+        } else {
+          input.click();
         }
+
+        // 🔥 선택 후 다시 숨기기
+        setTimeout(() => {
+          input.style.opacity = "0";
+          input.style.pointerEvents = "none";
+          input.style.zIndex = "1";
+        }, 100);
       });
 
-      // 날짜 변경 이벤트
+      // 🔥 날짜 변경 이벤트 (유효성 검사 추가)
       input.addEventListener("change", (e) => {
-        dailyState.date = e.target.value;
+        const selectedDate = e.target.value;
+        const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+
+        // 🔥 어제보다 미래 날짜 선택 시 어제로 강제 변경
+        if (selectedDate > yesterday) {
+          e.target.value = yesterday;
+          dailyState.date = yesterday;
+
+          // 🔥 사용자에게 알림 (선택사항)
+          console.warn("최신 데이터는 어제까지만 제공됩니다.");
+        } else {
+          dailyState.date = selectedDate;
+        }
+
+        text.textContent = getDateText(dailyState.date);
+        // 🔥 날짜 표시 업데이트
+        updateDateDisplay(item, dailyState.date);
         syncDailyDateUI();
         updateDailyStatistics(matchData);
       });
@@ -789,7 +850,7 @@ function setupComparisonEvents(device, matchData) {
 
   if (!compareSection) return;
 
-  // 날짜 입력 이벤트 설정
+  // 🔥 날짜 입력 이벤트 설정
   const compareDateInputs = compareSection.querySelectorAll(".input-list-item");
   const actualDateInputs = Array.from(compareDateInputs).filter((item) => {
     const input = item.querySelector('input[type="date"]');
@@ -807,30 +868,73 @@ function setupComparisonEvents(device, matchData) {
     if (dateIndex === 0) {
       input.value = compareState.startDate;
       text.textContent = getDateText(compareState.startDate);
+      // 🔥 초기 날짜 표시 설정
+      updateDateDisplay(item, compareState.startDate);
     } else if (dateIndex === 1) {
       input.value = compareState.endDate;
       text.textContent = getDateText(compareState.endDate);
+      // 🔥 초기 날짜 표시 설정
+      updateDateDisplay(item, compareState.endDate);
     }
 
-    // 클릭 이벤트
+    // 🔥 날짜 제한 설정 추가 (최대 어제까지만)
+    setDateInputLimits(input);
+
+    // 🔥 클릭 이벤트 수정
     item.addEventListener("click", (e) => {
-      if (e.target !== input) {
-        if (input.showPicker) {
-          input.showPicker();
-        } else {
-          input.click();
-        }
+      e.preventDefault();
+      e.stopPropagation();
+
+      // 🔥 input을 임시로 보이게 만들고 날짜 선택기 열기
+      input.style.opacity = "1";
+      input.style.pointerEvents = "auto";
+      input.style.zIndex = "10";
+
+      if (input.showPicker) {
+        input.showPicker();
+      } else {
+        input.click();
       }
+
+      // 🔥 선택 후 다시 숨기기
+      setTimeout(() => {
+        input.style.opacity = "0";
+        input.style.pointerEvents = "none";
+        input.style.zIndex = "1";
+      }, 100);
     });
 
-    // 날짜 변경 이벤트
+    // 🔥 날짜 변경 이벤트 (유효성 검사 추가)
     input.addEventListener("change", (e) => {
-      const newDate = e.target.value;
+      const selectedDate = e.target.value;
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
 
-      if (dateIndex === 0) {
-        compareState.startDate = newDate;
-      } else if (dateIndex === 1) {
-        compareState.endDate = newDate;
+      // 🔥 어제보다 미래 날짜 선택 시 어제로 강제 변경
+      if (selectedDate > yesterday) {
+        e.target.value = yesterday;
+        const newDate = yesterday;
+
+        console.warn("최신 데이터는 어제까지만 제공됩니다.");
+
+        if (dateIndex === 0) {
+          compareState.startDate = newDate;
+          text.textContent = getDateText(newDate);
+          updateDateDisplay(item, newDate);
+        } else if (dateIndex === 1) {
+          compareState.endDate = newDate;
+          text.textContent = getDateText(newDate);
+          updateDateDisplay(item, newDate);
+        }
+      } else {
+        if (dateIndex === 0) {
+          compareState.startDate = selectedDate;
+          text.textContent = getDateText(selectedDate);
+          updateDateDisplay(item, selectedDate);
+        } else if (dateIndex === 1) {
+          compareState.endDate = selectedDate;
+          text.textContent = getDateText(selectedDate);
+          updateDateDisplay(item, selectedDate);
+        }
       }
 
       syncComparisonDateUI();
@@ -838,7 +942,7 @@ function setupComparisonEvents(device, matchData) {
     });
   });
 
-  // 드롭다운 이벤트 설정
+  // 🔥 드롭다운 이벤트 설정
   const dropdownItems = compareSection.querySelectorAll(".match-type-list-item");
   const actualDropdowns = Array.from(dropdownItems).filter((item) => {
     const hasDateInput = item.querySelector('input[type="date"]');
@@ -847,6 +951,7 @@ function setupComparisonEvents(device, matchData) {
   });
 
   actualDropdowns.forEach((item) => {
+    // 🔥 드롭다운 클릭 이벤트 (button 제거하고 item 직접 클릭)
     item.addEventListener("click", (e) => {
       e.stopPropagation();
 
