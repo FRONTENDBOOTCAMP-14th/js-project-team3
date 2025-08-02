@@ -1,5 +1,6 @@
 import "./score.css";
 import { renderSearchBar } from "../searchbar/search-Bar.js";
+import { addRecentSearch } from "../searchbar/search-Bar.js";
 import { renderRecordComponents } from "../record/record.js";
 import { apiService } from "../../services/api.js";
 
@@ -139,6 +140,8 @@ async function searchAndRenderUser(nickname) {
             showNoResults();
             return;
         }
+
+        addRecentSearch(nickname);
         
         const ouid = ouidResponse.data.ouid;
         

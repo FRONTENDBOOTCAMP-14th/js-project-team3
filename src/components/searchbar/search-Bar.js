@@ -1,8 +1,75 @@
-function extractBodyContent(html) {
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html;
-    const bodyElement = tempDiv.querySelector("body");
-    return bodyElement ? bodyElement.innerHTML : html;
+// 로컬 스토리지 키
+const RECENT_SEARCHES_KEY = 'recentSearches';
+const MAX_SEARCHES = 7;
+
+// 최근 검색어 가져오기
+function getRecentSearches() {
+    const searches = localStorage.getItem(RECENT_SEARCHES_KEY);
+    return searches ? JSON.parse(searches) : [];
+}
+
+// 최근 검색어 추가
+export function addRecentSearch(nickname) {
+    if (!nickname) return;
+    let searches = getRecentSearches();
+    searches = searches.filter(item => item !== nickname);
+    searches.unshift(nickname);
+    if (searches.length > MAX_SEARCHES) {
+        searches = searches.slice(0, MAX_SEARCHES);
+    }
+    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
+}
+
+// 특정 검색어 삭제
+function removeRecentSearch(nickname) {
+    let searches = getRecentSearches();
+    searches = searches.filter(item => item !== nickname);
+    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
+}
+
+// 모든 검색어 삭제
+function clearRecentSearches() {
+    localStorage.removeItem(RECENT_SEARCHES_KEY);
+    renderRecentSearches(); // 검색어 삭제 반영을 위한 렌더링링
+}
+
+// 최근 검색어 UI 렌더링
+function renderRecentSearches() {
+    const previousSearchList = document.querySelector(".previous-search-list");
+    if (!previousSearchList) return;
+
+    previousSearchList.innerHTML = ''; // 기존 목록 초기화
+    const searches = getRecentSearches();
+
+    if (searches.length > 0) {
+        const clearItem = document.createElement('li');
+        clearItem.className = 'previous-search-item clear-all-item';
+        clearItem.innerHTML = `<span class="previous-search-item__text">최근 기록 삭제</span>`;
+        clearItem.addEventListener('click', clearRecentSearches);
+        previousSearchList.appendChild(clearItem);
+
+        searches.forEach(nickname => {
+            const listItem = document.createElement('li');
+            listItem.className = 'previous-search-item';
+            listItem.innerHTML = `
+                <span class="previous-search-item__text">${nickname}</span>
+                <button class="previous-search-item__remove">X</button>
+            `;
+            // 닉네임 클릭 시 검색
+            listItem.querySelector('.previous-search-item__text').addEventListener('click', () => {
+                if (window.routeTo) {
+                    window.routeTo('score', { nickname });
+                }
+            });
+            // 삭제 버튼 클릭
+            listItem.querySelector('.previous-search-item__remove').addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                removeRecentSearch(nickname);
+                renderRecentSearches();
+            });
+            previousSearchList.appendChild(listItem);
+        });
+    }
 }
 
 export async function renderSearchBar(targetElement) {
@@ -31,24 +98,7 @@ export async function renderSearchBar(targetElement) {
           </button>
         </div>
       </form>
-      <ul class="previous-search-list">
-        <li class="previous-search-item">
-          <span class="previous-search-item__text">최근 기록 삭제</span>
-          <button class="previous-search-item__remove">X</button>
-        </li>
-        <li class="previous-search-item">
-          <span class="previous-search-item__text">안녕</span>
-          <button class="previous-search-item__remove">X</button>
-        </li>
-        <li class="previous-search-item">
-          <span class="previous-search-item__text">안녕</span>
-          <button class="previous-search-item__remove">X</button>
-        </li>
-        <li class="previous-search-item">
-          <span class="previous-search-item__text">안녕</span>
-          <button class="previous-search-item__remove">X</button>
-        </li>
-      </ul>
+      <ul class="previous-search-list"></ul>
     </section>
     `;
     
@@ -56,15 +106,12 @@ export async function renderSearchBar(targetElement) {
     
     const searchForm = targetElement.querySelector(".search-form");
     const searchInput = targetElement.querySelector(".search-form__input");
-    const previousSearchList = targetElement.querySelector(".previous-search-list");
     
     if (searchForm && searchInput) {
         searchForm.addEventListener("submit", function(e) {
             e.preventDefault();
             const searchTerm = searchInput.value.trim();
             if (searchTerm) {
-                console.log(`[SEARCHBAR] 검색어: ${searchTerm}`);
-                // URL 업데이트 및 검색 실행
                 if (window.routeTo) {
                     window.routeTo('score', { nickname: searchTerm });
                 }
@@ -72,13 +119,5 @@ export async function renderSearchBar(targetElement) {
         });
     }
     
-    const removeButtons = targetElement.querySelectorAll(".previous-search-item__remove");
-    removeButtons.forEach(button => {
-        button.addEventListener("click", function() {
-            const listItem = this.closest(".previous-search-item");
-            if (listItem) {
-                listItem.remove();
-            }
-        });
-    });
+    renderRecentSearches();
 }
