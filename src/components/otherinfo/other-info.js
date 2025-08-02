@@ -1,5 +1,3 @@
-import "./other-info.css";
-
 /**
  * 클랜, 랭크 정보를 표시하는 카드 컴포넌트
  * @param {object} props - 컴포넌트에 전달될 데이터
