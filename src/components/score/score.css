@@ -10,37 +10,15 @@
 }
 
 .search-guide {
-    text-align: center;
-    padding: 75px 0;
-    background-color: var(--lightgray-color);
+    background-image: url('/images/search-guide-pc.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     border-radius: 10px;
     margin-top: 3.125rem;
     margin-bottom: 180px;
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.search-guide__content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-}
-
-.search-guide__content h2 {
-    color: inherit;
-    margin-bottom: 30px;
-    font-size: 2rem;
-    font-weight: bold;
-}
-
-.search-guide__content p {
-    color: inherit;
-    font-size: 1.2rem;
+    min-height: 400px;
 }
 
 #content-section {
@@ -112,13 +90,24 @@
 
 /* 검색 결과 없음 */
 .no-results {
-    text-align: center;
-    padding: 20px;
-    color: #666;
-    background: #f8f9fa;
+    background-image: url('/images/search-guide-no-result-pc.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     border-radius: 8px;
     margin: 20px 0;
-    border: 1px solid #dee2e6;
-    position: relative;
-    z-index: 1001;
+    min-height: 300px;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+    .search-guide {
+        background-image: url('/images/search-guide-mobile.png');
+        min-height: 300px;
+    }
+    
+    .no-results {
+        background-image: url('/images/search-guide--no-result-mobile.png');
+        min-height: 200px;
+    }
 } 
