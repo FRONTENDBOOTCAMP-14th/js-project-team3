@@ -55,8 +55,8 @@ export async function renderTeamIntroduction(targetElement) {
           <strong class="team-member__name">박민성</strong>
           <span class="team-member__info">INFJ / 청도 / 01월 26일</span>
           <p class="team-member__quote">
-            "저한테 왜 그랬어요? <br />
-            말해봐요."
+            " 저한테 왜 그랬어요? <br />
+            말해봐요. "
           </p>
         </li>
         <li class="team-member">
@@ -73,7 +73,8 @@ export async function renderTeamIntroduction(targetElement) {
           <strong class="team-member__name">윤정화</strong>
           <span class="team-member__info">ENFP / 하남 / 12월 24일</span>
           <p class="team-member__quote">
-            "가치있는 것을 하는데 있어서 늦었다는 건 없다."
+            " 가치있는 것을 하는데 있어서 <br />
+            늦었다는 건 없다. "
           </p>
         </li>
         <li class="team-member">

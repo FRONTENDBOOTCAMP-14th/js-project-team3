@@ -7,8 +7,9 @@ let keyIndex = 0;
 // CORS 헤더 설정
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, Client-Id, Client-Secret",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, Client-Id, Client-Secret, X-Requested-With",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, DELETE",
+  "Access-Control-Max-Age": "86400",
 };
 
 // API 엔드포인트 매핑
@@ -169,7 +170,7 @@ async function callChzzkApi(params) {
   const size = params.size || 20;
   const next = params.next;
 
-  let url = `https://api.chzzk.naver.com/service/v1/lives?size=${size}`;
+  let url = `https://openapi.chzzk.naver.com/open/v1/lives?size=${size}`;
   if (next) {
     url += `&next=${next}`;
   }

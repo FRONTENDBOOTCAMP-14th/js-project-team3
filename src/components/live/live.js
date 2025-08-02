@@ -31,7 +31,7 @@ async function fetchLiveList(size = 20, next = null) {
                 return null;
             }
             
-            let url = `https://api.chzzk.naver.com/service/v1/lives?size=${size}`;
+            let url = `https://openapi.chzzk.naver.com/open/v1/lives?size=${size}`;
             if (next) {
                 url += `&next=${next}`;
             }
