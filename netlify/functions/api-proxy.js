@@ -162,6 +162,9 @@ async function callChzzkApi(params) {
   console.log("치지직 API 환경 변수 확인:");
   console.log("- VITE_NAVER_CLIENT_ID:", !!process.env.VITE_NAVER_CLIENT_ID);
   console.log("- VITE_NAVER_CLIENT_SECRET:", !!process.env.VITE_NAVER_CLIENT_SECRET);
+  console.log("- NAVER_CLIENT_ID:", !!process.env.NAVER_CLIENT_ID);
+  console.log("- NAVER_CLIENT_SECRET:", !!process.env.NAVER_CLIENT_SECRET);
+  console.log("- 전체 환경 변수 키:", Object.keys(process.env).filter(key => key.includes('NAVER') || key.includes('CHZZK')));
 
   if (!clientId || !clientSecret) {
     console.error("치지직 API credentials not configured");
@@ -221,11 +224,14 @@ async function callChzzkApi(params) {
       hasContent: !!responseData.content,
       contentLength: responseData.content ? responseData.content.length : 0,
       hasCode: !!responseData.code,
-      hasMessage: !!responseData.message
+      hasMessage: !!responseData.message,
+      code: responseData.code,
+      message: responseData.message
     });
 
     // 치지직 API 응답 구조 확인 및 변환
-    if (responseData.code && responseData.code !== "SUCCESS") {
+    // HTTP 200이면 성공으로 간주하고, code 필드가 있더라도 content가 있으면 성공으로 처리
+    if (responseData.code && responseData.code !== "SUCCESS" && !responseData.content) {
       throw new Error(`치지직 API 오류: ${responseData.message || responseData.code}`);
     }
 
@@ -267,6 +273,9 @@ async function callChzzkApi(params) {
     }
     
     console.error("치지직 API 호출 중 오류:", error.message);
+    console.error("치지직 API 오류 스택:", error.stack);
+    console.error("치지직 API 오류 타입:", error.constructor.name);
+    console.error("치지직 API 오류 전체 객체:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
     throw error;
   }
 }
