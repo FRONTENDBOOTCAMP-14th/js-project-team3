@@ -1,20 +1,20 @@
 .main-button {
   display: inline-block;
-  width: 27.5rem;
+  width: 25rem;
   height: 6.25rem;
   background-color: var(--main-color);
   border-radius: 500px;
   text-align: center;
-  font-size: 2.125rem;
+  font-size: 1.5rem;
   font-weight: 600;
   line-height: 6.25rem;
   transition: transform 0.1s;
 
   &:hover {
-    transform: scale(1.01);
+    transform: scale(1.02);
   }
 
   &:active {
-    transform: scale(0.99);
+    transform: scale(0.98);
   }
 }
