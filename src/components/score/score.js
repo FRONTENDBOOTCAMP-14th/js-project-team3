@@ -108,17 +108,16 @@ function showNoResults() {
             existingNoResults.remove();
         }
         
+        // 검색 가이드 숨기기
+        const searchGuide = document.getElementById("search-guide");
+        if (searchGuide) {
+            searchGuide.style.display = "none";
+        }
+        
         // 결과 없음 메시지 생성
         const noResultsMessage = document.createElement("div");
         noResultsMessage.className = "no-results";
-        noResultsMessage.innerHTML = `<p>검색 결과가 없습니다. 다른 닉네임을 입력해보세요.</p>`;
         contentSection.appendChild(noResultsMessage);
-        
-        // 검색 가이드 다시 표시
-        const searchGuide = document.getElementById("search-guide");
-        if (searchGuide) {
-            searchGuide.style.display = "block";
-        }
     }
 }
 
@@ -148,7 +147,7 @@ async function searchAndRenderUser(nickname) {
         
         if (!userInfo.success || !userInfo.data) {
             hideLoading();
-            showError("사용자 정보를 가져올 수 없습니다.");
+            showNoResults();
             return;
         }
         
@@ -205,7 +204,7 @@ async function searchAndRenderUser(nickname) {
     } catch (error) {
         console.error("[SCORE] 사용자 검색 실패:", error);
         hideLoading();
-        showError(`검색 중 오류가 발생했습니다: ${error.message}`);
+        showNoResults();
     }
 }
 
@@ -216,12 +215,7 @@ export async function renderScorePage(targetElement, params = {}) {
     <div class="score-container container">
         <div id="searchbar-section" class="searchbar-margin"></div>
         <div id="content-section">
-            <div id="search-guide" class="search-guide">
-                <div class="search-guide__content">
-                    <h2>전적 검색</h2>
-                    <p>검색창에 닉네임을 입력하여 전적을 확인하세요.</p>
-                </div>
-            </div>
+            <div id="search-guide" class="search-guide"></div>
             <div id="record-section" class="record-section" style="display: none;"></div>
         </div>
     </div>

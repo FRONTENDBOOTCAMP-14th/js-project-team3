@@ -24,7 +24,7 @@ const API_ENDPOINTS = {
   "match-detail": "/match-detail",
 
   // Live APIs
-  "chzzk-lives": "chzzk",
+  "chzzk-lives": "/open/v1/lives",
   "youtube-lives": "youtube",
 };
 
@@ -114,10 +114,18 @@ function validateRequest(event) {
   return { isValid: true, endpoint, path };
 }
 
-// Nexon API URL 생성
-function buildNexonApiUrl(endpoint, queryParams) {
-  const baseUrl = process.env.VITE_NEXON_OPEN_API_URL || "https://open.api.nexon.com/suddenattack/v1";
-  const apiPath = API_ENDPOINTS[endpoint];
+// API URL 생성 (Nexon + Chzzk)
+function buildApiUrl(endpoint, queryParams) {
+  let baseUrl, apiPath;
+  
+  if (endpoint === "chzzk-lives") {
+    baseUrl = "https://openapi.chzzk.naver.com";
+    apiPath = API_ENDPOINTS[endpoint];
+  } else {
+    // Nexon API
+    baseUrl = process.env.VITE_NEXON_OPEN_API_URL || "https://open.api.nexon.com/suddenattack/v1";
+    apiPath = API_ENDPOINTS[endpoint];
+  }
 
   if (!apiPath) {
     throw new Error(`Unknown endpoint: ${endpoint}`);
@@ -154,8 +162,6 @@ async function callChzzkApi(params) {
   console.log("치지직 API 환경 변수 확인:");
   console.log("- VITE_NAVER_CLIENT_ID:", !!process.env.VITE_NAVER_CLIENT_ID);
   console.log("- VITE_NAVER_CLIENT_SECRET:", !!process.env.VITE_NAVER_CLIENT_SECRET);
-  console.log("- NAVER_CLIENT_ID:", !!process.env.NAVER_CLIENT_ID);
-  console.log("- NAVER_CLIENT_SECRET:", !!process.env.NAVER_CLIENT_SECRET);
 
   if (!clientId || !clientSecret) {
     console.error("치지직 API credentials not configured");
@@ -170,10 +176,13 @@ async function callChzzkApi(params) {
   const size = params.size || 20;
   const next = params.next;
 
-  let url = `https://openapi.chzzk.naver.com/open/v1/lives?size=${size}`;
+  // buildApiUrl 함수를 사용하여 URL 생성
+  let queryParams = `size=${size}`;
   if (next) {
-    url += `&next=${next}`;
+    queryParams += `&next=${next}`;
   }
+  
+  const url = buildApiUrl("chzzk-lives", queryParams);
 
   console.log("치지직 API 요청 URL:", url);
   console.log("치지직 API 요청 헤더:", {
@@ -389,46 +398,7 @@ exports.handler = async function (event, context) {
     console.log("경로:", path);
     console.log("쿼리 파라미터:", queryParams);
 
-    // 2. 라이브 API 처리
-    if (endpoint === 'chzzk-lives') {
-      try {
-        const params = new URLSearchParams(queryParams);
-        console.log("치지직 라이브 API 호출 시작");
-        console.log("파라미터:", {
-          size: params.get('size'),
-          next: params.get('next')
-        });
-        
-        const data = await callChzzkApi({
-          size: params.get('size'),
-          next: params.get('next')
-        });
-        
-        console.log("치지직 라이브 API 호출 성공");
-        
-        return {
-          statusCode: 200,
-          headers: corsHeaders,
-          body: JSON.stringify({
-            success: true,
-            data: data
-          })
-        };
-      } catch (error) {
-        console.error("치지직 라이브 API 처리 중 오류:", error.message);
-        console.error("오류 스택:", error.stack);
-        
-        return {
-          statusCode: 500,
-          headers: corsHeaders,
-          body: JSON.stringify({
-            success: false,
-            error: "치지직 라이브 API 호출 실패",
-            details: error.message
-          })
-        };
-      }
-    }
+
 
     if (endpoint === "youtube-lives") {
       const params = new URLSearchParams(queryParams);
@@ -498,7 +468,7 @@ exports.handler = async function (event, context) {
           }),
         };
       }
-      apiUrl = buildNexonApiUrl(endpoint, `user_name=${encodeURIComponent(nickname)}`);
+      apiUrl = buildApiUrl(endpoint, `user_name=${encodeURIComponent(nickname)}`);
     } else {
       // 나머지 엔드포인트는 OUID 기반
       const ouid = new URLSearchParams(queryParams).get("ouid");
@@ -527,14 +497,26 @@ exports.handler = async function (event, context) {
         console.log("🔄 모든 매치 타입 조회 설정:", params);
       }
 
-      apiUrl = buildNexonApiUrl(endpoint, params);
+      apiUrl = buildApiUrl(endpoint, params);
     }
 
     console.log("최종 요청 URL:", apiUrl);
 
-    // 6. Nexon API 호출
+    // 6. API 호출 (Nexon 또는 Chzzk)
     try {
-      const data = await callNexonApi(apiUrl, apiKey);
+      let data;
+      if (endpoint === "chzzk-lives") {
+        // 치지직 API는 별도 처리 (API 키 불필요)
+        const params = new URLSearchParams(queryParams);
+        data = await callChzzkApi({
+          size: params.get('size'),
+          next: params.get('next')
+        });
+      } else {
+        // Nexon API 호출
+        data = await callNexonApi(apiUrl, apiKey);
+      }
+      
       console.log("API 응답 성공");
       console.log("--- Netlify API 프록시 실행 종료 (성공) ---");
 
@@ -547,16 +529,18 @@ exports.handler = async function (event, context) {
         }),
       };
     } catch (apiError) {
-      console.error("Nexon API 호출 실패:", apiError.message);
+      console.error("API 호출 실패:", apiError.message);
       console.error("API URL:", apiUrl);
-      console.error("API 키 (앞 8자리):", apiKey.substring(0, 8) + "...");
+      if (endpoint !== "chzzk-lives") {
+        console.error("API 키 (앞 8자리):", apiKey.substring(0, 8) + "...");
+      }
 
       return {
         statusCode: 500,
         headers: corsHeaders,
         body: JSON.stringify({
           success: false,
-          error: "Nexon API 호출 실패",
+          error: "API 호출 실패",
           details: apiError.message,
         }),
       };
