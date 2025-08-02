@@ -1,5 +1,5 @@
-import { formatDate } from "../../utils/date";
-import { OtherInfo } from "../otherinfo/other-info.js";
+import { formatDate } from "../../utils/date.js";
+import { OtherInfo } from "../other-info/other-info.js";
 import { formatMatchDataForOtherInfo } from "../../service/user.js";
 import total_grade_Response from "../../data/total_grade_Response.json";
 import season_grade_Response from "../../data/season_grade_Response.json";
