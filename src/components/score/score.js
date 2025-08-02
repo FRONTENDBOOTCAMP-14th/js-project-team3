@@ -1,5 +1,6 @@
 import "./score.css";
 import { renderSearchBar } from "../searchbar/search-Bar.js";
+import { addRecentSearch } from "../searchbar/search-Bar.js";
 import { renderRecordComponents } from "../record/record.js";
 import { apiService } from "../../services/api.js";
 
@@ -175,26 +176,89 @@ async function searchAndRenderUser(nickname) {
     };
 
     try {
-      await renderRecordComponents(renderData);
-      hideLoading();
-      showRecordSection();
+        if (!nickname || nickname.trim() === "") {
+            showError("유효한 닉네임을 입력해주세요.");
+            return;
+        }
+        
+        showLoading();
+        
+        // 1. 닉네임으로 OUID 조회
+        const ouidResponse = await apiService.getOuidByNickname(nickname);
+        
+        if (!ouidResponse.success || !ouidResponse.data || !ouidResponse.data.ouid) {
+            hideLoading();
+            showNoResults();
+            return;
+        }
 
-      // 전적 갱신 버튼에 이벤트 리스너 추가
-      const refreshButton = document.querySelector(".user-profile__header__right__refresh-button");
-      if (refreshButton) {
-        refreshButton.addEventListener("click", async () => {
-          // 버튼 비활성화 및 텍스트 변경
-          refreshButton.disabled = true;
-          refreshButton.textContent = "갱신 중...";
+        addRecentSearch(nickname);
+        
+        const ouid = ouidResponse.data.ouid;
+        
+        // 2. 사용자 기본 정보 조회
+        const userInfo = await apiService.getUserInfo(ouid);
+        
+        if (!userInfo.success || !userInfo.data) {
+            hideLoading();
+            showNoResults();
+            return;
+        }
+        
+        // 3. 매치 목록 조회
+        const matchList = await apiService.getMatchList(ouid, "폭파미션", "일반전");
+        
+        // 4. 나머지 사용자 데이터 병렬로 조회 (에러가 나도 계속 진행)
+        const [
+            userStats,
+            userTier,
+            userRecentInfo
+        ] = await Promise.allSettled([
+            apiService.getUserStats(ouid),
+            apiService.getUserTier(ouid),
+            apiService.getUserRecentInfo(ouid)
+        ]);
+        
+        // 5. Record 컴포넌트들 렌더링 (성공한 데이터만 사용)
+        const renderData = {
+            userInfo: {
+                basicInfo: userInfo.data,
+                rankInfo: userTier.status === "fulfilled" ? userTier.value?.data : null,
+                recentInfo: userRecentInfo.status === "fulfilled" ? userRecentInfo.value?.data : null
+            },
+            userStats: userStats.status === "fulfilled" ? userStats.value?.data : null,
+            userTier: userTier.status === "fulfilled" ? userTier.value?.data : null,
+            userRecentInfo: userRecentInfo.status === "fulfilled" ? userRecentInfo.value?.data : null,
+            matchList: matchList.success ? matchList.data : null
+        };
+        
+        try {
+            await renderRecordComponents(renderData);
+            hideLoading();
+            showRecordSection();
 
-          // 동일한 닉네임으로 데이터 다시 검색 및 렌더링
-          await searchAndRenderUser(nickname);
-        });
-      }
-    } catch (renderError) {
-      console.error(`[SCORE] Record 컴포넌트 렌더링 실패:`, renderError);
-      hideLoading();
-      showError(`렌더링 중 오류가 발생했습니다: ${renderError.message}`);
+            // 전적 갱신 버튼에 이벤트 리스너 추가
+            const refreshButton = document.querySelector(".user-profile__header__right__refresh-button");
+            if (refreshButton) {
+                refreshButton.addEventListener('click', async () => {
+                    // 버튼 비활성화 및 텍스트 변경
+                    refreshButton.disabled = true;
+                    refreshButton.textContent = '갱신 중...';
+                    
+                    // 동일한 닉네임으로 데이터 다시 검색 및 렌더링
+                    await searchAndRenderUser(nickname);
+                });
+            }
+        } catch (renderError) {
+            console.error(`[SCORE] Record 컴포넌트 렌더링 실패:`, renderError);
+            hideLoading();
+            showError(`렌더링 중 오류가 발생했습니다: ${renderError.message}`);
+        }
+        
+    } catch (error) {
+        console.error("[SCORE] 사용자 검색 실패:", error);
+        hideLoading();
+        showNoResults();
     }
   } catch (error) {
     console.error("[SCORE] 사용자 검색 실패:", error);
