@@ -152,7 +152,7 @@ export async function renderNewsPage(targetElement) {
       </div>
     </div>
 
-    <div class="ranking-container">
+    <div class="ranking-container news-footer-margin">
       <div class="ranking-tabs">
         <button class="ranking-tab active" data-type="total">통합랭킹</button>
         <button class="ranking-tab" data-type="season">시즌랭킹</button>

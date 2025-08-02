@@ -200,7 +200,7 @@ export async function renderScorePage(targetElement, params = {}) {
     
     const html = `
     <div class="score-container container">
-        <div id="searchbar-section"></div>
+        <div id="searchbar-section" class="searchbar-margin"></div>
         <div id="content-section">
             <div id="search-guide" class="search-guide">
                 <div class="search-guide__content">

@@ -18,8 +18,8 @@ export async function renderMainVisual(targetElement) {
             <img class="visual-img01" src="/images/visual-item01.png" alt="서든어택" />
             <img class="visual-img02" src="/images/visual-item02.png" alt="오징어게임 시즌3" />
             <p class="visual-text">
-                NETFLIX 오징어 게임 시즌3와의 콜라보레이션 2차 대공개!<br />
-                오징어 게임 캐릭터 세트와 스킨 무기, SP와 제작 재료 등 풍성한 보상 획득의 기회!
+                Team 3보급창고는 "넥슨 OPEN API"를 활용해 "서든어택" 유저의 전적을 조회할 수 있는 웹사이트를 개발<br />
+                오징어게임의 스릴 넘치는 세계관을 담아 Black & Pink를 메인 컬러로 설정, 강렬하면서도 대조적인 분위기를 연출!
             </p>
         </div>
     </section>

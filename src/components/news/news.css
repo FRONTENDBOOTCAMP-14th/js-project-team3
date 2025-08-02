@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
-  margin-top: 50px;
+  margin-top: 3.125rem;
 
   @media (max-width: 1024px) {
     flex-direction: column;
@@ -19,7 +19,6 @@
 
   @media (max-width: 1024px) {
     width: 100%;
-    margin-top: 25px;
   }
 }
 
@@ -126,6 +125,7 @@
 
 .event-info {
   flex: 1;
+  min-width: 0;
   padding: 5px 20px;
   display: flex;
   flex-direction: column;
@@ -141,15 +141,17 @@
   font-weight: bold;
   color: var(--main-color);
   margin-bottom: 10px;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .event-desc {
-  width: 99%;
+  width: 100%;
   font-size: 0.9rem;
   margin-bottom: 10px;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -159,6 +161,10 @@
   font-size: 0.8rem;
   color: var(--line-color);
   margin-bottom: 10px;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ranking-container {
@@ -243,4 +249,8 @@
 .ranking-nickname {
   font-weight: bold;
   color: var(--main-color);
+}
+
+.news-footer-margin {
+  margin-bottom: 180px;
 }

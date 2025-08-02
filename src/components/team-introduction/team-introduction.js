@@ -44,19 +44,19 @@ export async function renderTeamIntroduction(targetElement) {
   const html = `
     <section class="team-intro container">
       <div class="team-intro__header">
-        <span class="team-intro__team-name">TEAM 3보급창고</span>
-        <h2 class="team-intro__title">코드는 깔끔하게, 기능은 탄탄하게</h2>
-        <p class="team-intro__desc">팀 3보급창고는 Sudden Attack의 전적을 시원하게 조회하는 웹사이트를 구현했습니다.</p>
+        <span class="team-intro__team-name">Code Players</span>
+        <h2 class="team-intro__title">코드생존을 건 개발, 팀 3보급창고</h2>
+        <p class="team-intro__desc">각자 맡은 역할에서 최선을 다해 미션을 수행</p>
       </div>
 
       <ul class="team-intro__members">
         <li class="team-member">
           <div class="team-member__img-wrap member-img01"></div>
           <strong class="team-member__name">박민성</strong>
-          <span class="team-member__info">INFJ/청도/ 01월 26일일</span>
+          <span class="team-member__info">INFJ / 청도 / 01월 26일</span>
           <p class="team-member__quote">
-            " 함께 성장하며, 기술의 흐름 속에<br />
-            지속가능한 개발자로 나아갑니다. "
+            "저한테 왜 그랬어요? <br />
+            말해봐요."
           </p>
         </li>
         <li class="team-member">
@@ -64,8 +64,8 @@ export async function renderTeamIntroduction(targetElement) {
           <strong class="team-member__name">심현보</strong>
           <span class="team-member__info">ENFJ / 신림 / 07월 30일</span>
           <p class="team-member__quote">
-            " 함께 성장하며, 기술의 흐름 속에<br />
-            지속가능한 개발자로 나아갑니다. "
+            " 사람을 화나게 하는 두가지 방법이 있는데 <br />
+            첫번쨰는 "
           </p>
         </li>
         <li class="team-member">
@@ -73,8 +73,7 @@ export async function renderTeamIntroduction(targetElement) {
           <strong class="team-member__name">윤정화</strong>
           <span class="team-member__info">ENFP / 하남 / 12월 24일</span>
           <p class="team-member__quote">
-            " 함께 성장하며, 기술의 흐름 속에<br />
-            지속가능한 개발자로 나아갑니다. "
+            "가치있는 것을 하는데 있어서 늦었다는 건 없다."
           </p>
         </li>
         <li class="team-member">
@@ -82,8 +81,7 @@ export async function renderTeamIntroduction(targetElement) {
           <strong class="team-member__name">한우창</strong>
           <span class="team-member__info">ISTP / 서울 / 9월 22일</span>
           <p class="team-member__quote">
-            " 함께 성장하며, 기술의 흐름 속에<br />
-            지속가능한 개발자로 나아갑니다. "
+            " 뭣이 중헌디! "
           </p>
         </li>
       </ul>

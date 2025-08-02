@@ -32,16 +32,14 @@ export async function renderRecordComponents(userData) {
   }
 
   const html = `
-    <div class="record-container">
-        <section class="section-margin" id="searchbar-section"></section>
+    <div class="record-container">  
+        <section class="record-section-margin" id="user-info-section"></section>
         
-        <section class="section-margin" id="user-info-section"></section>
+        <section class="record-section-margin" id="score-info-section"></section>
         
-        <section class="section-margin" id="score-info-section"></section>
+        <section class="record-section-margin" id="total-statistics-section"></section>
         
-        <section class="section-margin" id="total-statistics-section"></section>
-        
-        <section class="section-margin" id="score-detail-section"></section>
+        <section class="record-section-margin" id="score-detail-section"></section>
     </div>
     `;
 
@@ -117,15 +115,15 @@ export async function renderRecordPage(targetElement, userData = null) {
 
   const html = `
     <div class="record-container">
-        <section class="section-margin" id="searchbar-section"></section>
+        <section class="record-section-margin" id="searchbar-section"></section>
         
-        <section class="section-margin" id="user-info-section"></section>
+        <section class="record-section-margin" id="user-info-section"></section>
         
-        <section class="section-margin" id="score-info-section"></section>
+        <section class="record-section-margin" id="score-info-section"></section>
         
-        <section class="section-margin" id="total-statistics-section"></section>
+        <section class="record-section-margin" id="total-statistics-section"></section>
         
-        <section class="section-margin" id="score-detail-section"></section>
+        <section class="record-section-margin" id="score-detail-section"></section>
     </div>
     `;
 

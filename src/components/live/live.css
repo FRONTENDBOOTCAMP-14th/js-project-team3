@@ -5,7 +5,7 @@
     background-color: var(--lightgray-color);
     display: flex;
     align-items: center;
-    margin-top: 50px;
+    margin-top: 3.125rem;
     margin-bottom: 25px;
 }
 
@@ -192,5 +192,5 @@
 }
 
 .footer-margin {
-    margin-bottom: 50px;
+    margin-bottom: 180px;
 }
