@@ -1,5 +1,5 @@
 import "./record.css";
-import { UserInfo } from "../userinfo/user-Info.js";
+import { UserInfo } from "../user-info/user-Info.js";
 import { renderScoreInfo } from "../score-info/score-info.js";
 import { renderScoreDetail } from "../score-detail/score-detail.js";
 import { renderTotalStatistics } from "../total-statistics/total-statistics.js";

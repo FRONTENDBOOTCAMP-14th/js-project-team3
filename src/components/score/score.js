@@ -56,8 +56,9 @@ function showLoading() {
         const loadingOverlay = document.createElement("div");
         loadingOverlay.className = "loading-overlay";
         loadingOverlay.innerHTML = `
-            <div class="loading">
-                <p>검색 중입니다...</p>
+            <div class="loading-indicator">
+                <div class="spinner"></div>
+                <p>Loading...</p>
             </div>
         `;
         contentSection.appendChild(loadingOverlay);
