@@ -182,6 +182,19 @@ async function searchAndRenderUser(nickname) {
             await renderRecordComponents(renderData);
             hideLoading();
             showRecordSection();
+
+            // 전적 갱신 버튼에 이벤트 리스너 추가
+            const refreshButton = document.querySelector(".user-profile__header__right__refresh-button");
+            if (refreshButton) {
+                refreshButton.addEventListener('click', async () => {
+                    // 버튼 비활성화 및 텍스트 변경
+                    refreshButton.disabled = true;
+                    refreshButton.textContent = '갱신 중...';
+                    
+                    // 동일한 닉네임으로 데이터 다시 검색 및 렌더링
+                    await searchAndRenderUser(nickname);
+                });
+            }
         } catch (renderError) {
             console.error(`[SCORE] Record 컴포넌트 렌더링 실패:`, renderError);
             hideLoading();

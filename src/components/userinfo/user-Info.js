@@ -1,86 +1,14 @@
-import "./user-Info.css";
-import "../otherinfo/other-Info.css";
 import { formatDate } from "../../utils/date";
 import { OtherInfo } from "../otherinfo/other-info.js";
+import { formatMatchDataForOtherInfo } from "../../service/user.js";
 import total_grade_Response from "../../data/total_grade_Response.json";
 import season_grade_Response from "../../data/season_grade_Response.json";
-import rank_tier_Response from "../../data/rank_tier_Response.json";
 
-// 임시 클랜원 목 데이터
-const mockOtherInfo = [
-  {
-    title: "클랜전",
-    name: "시크",
-    icon: "/icon/user_clan.svg",
-    stats: {
-      record: "150전 100승 (66.7%)",
-      kd: "70.1%",
-      headshot: "8.4%",
-      damage: "3,102",
-    },
-  },
-  {
-    title: "솔로랭크",
-    name: "LEGEND",
-    icon: "/icon/user_clan.svg",
-    stats: {
-      record: "122전 87승 (71.3%)",
-      kd: "65.5%",
-      headshot: "5.8%",
-      damage: "2,877",
-    },
-  },
-  {
-    title: "파티랭크",
-    name: "GRAND MASTER I",
-    icon: "/icon/user_clan.svg",
-    stats: {
-      record: "100전 50승 (50.0%)",
-      kd: "55.3%",
-      headshot: "4.1%",
-      damage: "2,500",
-    },
-  },
-];
-
-const mockUserInfo = {
-  basicInfo: {
-    user_name: "오리",
-    user_date_create: "2005-08-25T03:55:12.450Z",
-    title_name: "S",
-    clan_name: "시크",
-    manner_grade: "최고"
-  },
-  rankInfo: {
-    user_name: "오리",
-    grade: "부원수",
-    grade_exp: 782123992,
-    grade_ranking: 340,
-    season_grade: "총사령관",
-    season_grade_exp: 415192689,
-    season_grade_ranking: 1
-  },
-  tierInfo: {
-    user_name: "오리",
-    solo_rank_match_tier: "GRAND MASTER III",
-    solo_rank_match_score: 3546,
-    party_rank_match_tier: "GRAND MASTER I",
-    party_rank_match_score: 3184
-  },
-  recentInfo: {
-    user_name: "오리",
-    recent_win_rate: 53.333336,
-    recent_kill_death_rate: 57,
-    recent_assault_rate: 52.333332,
-    recent_sniper_rate: 66.666664,
-    recent_special_rate: 57.333332
-  }
-}
 
 export function UserInfo(targetElement, props) {
   // --- 상태 영역 ---
   let state = {
-    activeTab: "total", // "total" or "season"
+    activeTab: "total", // 'total' or 'season'
   };
 
   // --- 메서드 영역 ---
@@ -91,41 +19,26 @@ export function UserInfo(targetElement, props) {
 
   // --- 렌더링 영역 ---
   const render = () => {
-    const data = props?.data || mockUserInfo;
-    
-    // 데이터 구조 확인 및 변환
-    let basicInfo, rankInfo, recentInfo;
-    
-    if (data && data.basicInfo && data.rankInfo && data.recentInfo) {
-      // 새로운 구조 (API 데이터)
-      basicInfo = data.basicInfo;
-      rankInfo = data.rankInfo;
-      recentInfo = data.recentInfo;
-    } else if (data && data.basicInfo) {
-      // 기본 정보만 있는 경우
-      basicInfo = data.basicInfo;
-      rankInfo = data.rankInfo || {};
-      recentInfo = data.recentInfo || {};
-    } else if (data && typeof data === 'object') {
-      // 기존 구조 (mock 데이터) 또는 단일 객체
-      basicInfo = data.basicInfo || data;
-      rankInfo = data.rankInfo || {};
-      recentInfo = data.recentInfo || {};
-    } else {
-      // 데이터가 없는 경우
-      console.error(`[USERINFO] 유효한 데이터가 없습니다.`);
-      targetElement.innerHTML = `<div class="error">사용자 정보를 불러올 수 없습니다.</div>`;
-      return;
-    }
+    const data = props?.data;
+    console.log("data", data);
+    console.log("props", props);
+    const { userStats : userRankInfo, userTier: userTierInfo, userRecentInfo, matchList } = data;
+    const { basicInfo : userBasicInfo} = data.userInfo;
+    console.log("matchInfo", matchList);
+     //matchInfo는 일단 빼고 본격적으로 api받아올 때는 matchInfo도 적용 matchInfo만 이름 user안 붙음.
+
+    //이제 여기서 데이터 핸들링링 해줘야함 service폴더에 user.js로 가공
+   
+
 
     // 데이터가 완전히 로드되지 않았을 경우를 대비
-    if (!basicInfo) {
-      console.error(`[USERINFO] basicInfo가 없습니다.`);
-      targetElement.innerHTML = `<div class="error">사용자 정보를 불러올 수 없습니다.</div>`;
+    if (!userBasicInfo || !userRankInfo || !userTierInfo || !userRecentInfo || !matchList) {
       return;
     }
-    
-    const { date, years } = formatDate(basicInfo.user_date_create || new Date().toISOString());
+    const otherInfos = formatMatchDataForOtherInfo({ userBasicInfo, userTierInfo, matchList });
+    console.log(otherInfos);
+    const { date, years } = formatDate(userBasicInfo.user_date_create);
+    const gradeImage = state.activeTab === "total" ? total_grade_Response.find((grade) => grade.grade === userRankInfo.grade)?.grade_image : season_grade_Response.find((grade) => grade.season_grade === userRankInfo.season_grade)?.season_grade_image;
 
     targetElement.innerHTML = `
     <div class="container user-info">
@@ -154,12 +67,11 @@ export function UserInfo(targetElement, props) {
             <div class="user-profile__body__info">
               <img src="/images/profile/user-default-img.png" alt="유저 이미지" class="user-profile__body__info__img" />
               <div class="user-profile__body__info__content">
+              <img src="${gradeImage}" alt="유저 이미지" class="user-profile__body__info__grade" />
                 <div class="user-profile__body__info__content__name">${
-                  basicInfo.user_name
+                  userBasicInfo.user_name
                 }</div>
-                <span class="user-profile__body__info__content__rank">(${
-                  rankInfo.rank_ranking || rankInfo.grade_ranking || "정보 없음"
-                } 위)</span>
+                <span class="user-profile__body__info__content__rank">(${state.activeTab === "total" ? userRankInfo.grade_ranking : userRankInfo.season_grade_ranking} 위)</span>
               </div>
             </div>
 
@@ -168,13 +80,13 @@ export function UserInfo(targetElement, props) {
                 <div class="stat-item__left">
                   <div class="stat-item__value__top"><img src="/icon/user_win_rate.svg" alt="승률" />승률</div>
                   <div class="stat-item__value__bottom">${Number(
-                    recentInfo.recent_win_rate || 0
+                    userRecentInfo.recent_win_rate
                   ).toFixed(2)}%</div>
                 </div>
                 <div class="stat-item__right">
                   <div class="stat-item__value__top"><img src="/icon/user_score.svg" alt="킬뎃" />킬뎃</div>
                   <div class="stat-item__value__bottom">${Number(
-                    recentInfo.recent_kill_death_rate || 0
+                    userRecentInfo.recent_kill_death_rate
                   ).toFixed(2)}%</div>
                 </div>
               </div>
@@ -182,13 +94,13 @@ export function UserInfo(targetElement, props) {
                 <div class="stat-item__left">
                   <div class="stat-item__value__top"><img src="/icon/user_gun.svg" alt="라플" />라플</div>
                   <div class="stat-item__value__bottom">${Number(
-                    recentInfo.recent_assault_rate || 0
+                    userRecentInfo.recent_assault_rate
                   ).toFixed(2)}%</div>
                 </div>
                 <div class="stat-item__right">
                   <div class="stat-item__value__top"><img src="/icon/user_gun.svg" alt="스나" />스나</div>
                   <div class="stat-item__value__bottom">${Number(
-                    recentInfo.recent_sniper_rate || 0
+                    userRecentInfo.recent_sniper_rate
                   ).toFixed(2)}%</div>
                 </div>
               </div>
@@ -196,7 +108,7 @@ export function UserInfo(targetElement, props) {
                 <div class="stat-item__left">
                   <div class="stat-item__value__top"><img src="/icon/user_gun.svg" alt="특수" />특수</div>
                   <div class="stat-item__value__bottom">${Number(
-                    recentInfo.recent_special_rate || 0
+                    userRecentInfo.recent_special_rate
                   ).toFixed(2)}%</div>
                 </div>
                 <div class="stat-item__right">
@@ -208,13 +120,13 @@ export function UserInfo(targetElement, props) {
                 <div class="stat-item__left">
                   <div class="stat-item__value__top"><img src="/icon/user_clan.svg" alt="클랜" />클랜</div>
                   <div class="stat-item__value__bottom">${
-                    basicInfo.clan_name || "없음"
+                    userBasicInfo.clan_name || "없음"
                   }</div>
                 </div>
                 <div class="stat-item__right">
                   <div class="stat-item__value__top"><img src="/icon/user_honor.svg" alt="매너" />매너</div>
                   <div class="stat-item__value__bottom">${
-                    basicInfo.manner_grade || "정보 없음"
+                    userBasicInfo.manner_grade || "정보 없음"
                   }</div>
                 </div>
               </div>
@@ -224,7 +136,7 @@ export function UserInfo(targetElement, props) {
         </div>
        </div> 
       
-      ${mockOtherInfo.map((info) => OtherInfo({ info })).join("")}
+      ${otherInfos.map((info) => OtherInfo({ info })).join("")}
       </div>
     `;
 
