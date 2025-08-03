@@ -172,7 +172,9 @@ function createMatchItemElement(matchData) {
                         <p class="match-stats-value">${damage}</p>
                     </div>
                 </section>
-                <button class="btn-match-detail grid-full-width-section" type="button">▼</button>
+                                 <button class="btn-match-detail grid-full-width-section" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
+   <polygon points="4,4 20,4 12,16"></polygon>
+ </svg></button>
             </section>
         </section>
         <section class="user-match-detail-wrapper" style="display:none">
@@ -248,10 +250,13 @@ async function handleDetailToggle(e) {
   const detailWrapper = matchItem.querySelector(".user-match-detail-wrapper");
   const isHidden = detailWrapper.style.display === "none";
 
+  // 모든 상세 정보 숨기기 및 모든 버튼에서 active 클래스 제거
   document.querySelectorAll(".user-match-detail-wrapper").forEach((el) => (el.style.display = "none"));
+  document.querySelectorAll(".btn-match-detail").forEach((btn) => btn.classList.remove("active"));
 
   if (isHidden) {
     detailWrapper.style.display = "block";
+    detailButton.classList.add("active"); // 현재 버튼에 active 클래스 추가
     if (!detailWrapper.dataset.loaded) {
       const matchId = matchItem.querySelector(".match-preview-section").dataset.matchId;
       await loadMatchDetail(matchId, detailWrapper);
