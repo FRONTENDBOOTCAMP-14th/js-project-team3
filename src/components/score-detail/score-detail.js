@@ -2,7 +2,7 @@ import { apiService } from "../../services/api.js";
 import "./score-detail.css";
 
 // --- 상수 및 상태 변수 ---
-const RESULT_KEY_VALUE = { "1": "승리", "2": "패배", "3": "무승부", DEFAULT: "-" };
+const RESULT_KEY_VALUE = { 1: "승리", 2: "패배", 3: "무승부", DEFAULT: "-" };
 const MATCHES_PER_PAGE = 5;
 let currentPage = 1;
 let allMatches = [];
@@ -16,39 +16,96 @@ let reCallTargetElement = null;
 
 // --- 순수 헬퍼 함수 ---
 function getTimeAgo(dateMatchString) {
-    if (!dateMatchString) return "-";
-    const matchDate = new Date(dateMatchString);
-    const now = new Date();
-    const diffMilliseconds = now.getTime() - matchDate.getTime();
-    const diffMinutes = Math.floor(diffMilliseconds / (1000 * 60));
-    const diffHours = Math.floor(diffMilliseconds / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMilliseconds / (1000 * 60 * 60 * 24));
+  if (!dateMatchString) return "-";
+  const matchDate = new Date(dateMatchString);
+  const now = new Date();
+  const diffMilliseconds = now.getTime() - matchDate.getTime();
+  const diffMinutes = Math.floor(diffMilliseconds / (1000 * 60));
+  const diffHours = Math.floor(diffMilliseconds / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMilliseconds / (1000 * 60 * 60 * 24));
 
-    if (diffMinutes < 60) return `${diffMinutes}분 전`;
-    if (diffHours < 24) return `${diffHours}시간 전`;
-    if (diffDays < 30) return `${diffDays}일 전`;
+  if (diffMinutes < 60) return `${diffMinutes}분 전`;
+  if (diffHours < 24) return `${diffHours}시간 전`;
+  if (diffDays < 30) return `${diffDays}일 전`;
 
-    const year = matchDate.getFullYear();
-    const month = (matchDate.getMonth() + 1).toString().padStart(2, "0");
-    const day = matchDate.getDate().toString().padStart(2, "0");
-    return `${year}.${month}.${day}.`;
+  const year = matchDate.getFullYear();
+  const month = (matchDate.getMonth() + 1).toString().padStart(2, "0");
+  const day = matchDate.getDate().toString().padStart(2, "0");
+  return `${year}.${month}.${day}.`;
 }
 
 function getRankIcon(seasonGrade) {
-    const icons = { "특등이병": "class_00.png", "특등일병": "class_01.png", "특등상병": "class_02.png", "특급병장": "class_03.png", "특전하사 1호봉": "class_04.png", "특전하사 2호봉": "class_05.png", "특전하사 3호봉": "class_06.png", "특전하사 4호봉": "class_07.png", "특전하사 5호봉": "class_08.png", "특전중사 1호봉": "class_09.png", "특전중사 2호봉": "class_10.png", "특전중사 3호봉": "class_11.png", "특전중사 4호봉": "class_12.png", "특전중사 5호봉": "class_13.png", "특전상사 1호봉": "class_14.png", "특전상사 2호봉": "class_15.png", "특전상사 3호봉": "class_16.png", "특전상사 4호봉": "class_17.png", "특전상사 5호봉": "class_18.png", "특임소위 1호봉": "class_19.png", "특임소위 2호봉": "class_20.png", "특임소위 3호봉": "class_21.png", "특임소위 4호봉": "class_22.png", "특임소위 5호봉": "class_23.png", "특임중위 1호봉": "class_24.png", "특임중위 2호봉": "class_25.png", "특임중위 3호봉": "class_26.png", "특임중위 4호봉": "class_27.png", "특임중위 5호봉": "class_28.png", "특임대위 1호봉": "class_29.png", "특임대위 2호봉": "class_30.png", "특임대위 3호봉": "class_31.png", "특임대위 4호봉": "class_32.png", "특임대위 5호봉": "class_33.png", "특공소령 1호봉": "class_34.png", "특공소령 2호봉": "class_35.png", "특공소령 3호봉": "class_36.png", "특공소령 4호봉": "class_37.png", "특공소령 5호봉": "class_38.png", "특공중령 1호봉": "class_39.png", "특공중령 2호봉": "class_40.png", "특공중령 3호봉": "class_41.png", "특공중령 4호봉": "class_42.png", "특공중령 5호봉": "class_43.png", "특공대령 1호봉": "class_44.png", "특공대령 2호봉": "class_45.png", "특공대령 3호봉": "class_46.png", "특공대령 4호봉": "class_47.png", "특공대령 5호봉": "class_48.png", "특급준장": "class_49.png", "특급소장": "class_50.png", "특급중장": "class_51.png", "특급대장": "class_52.png", "부사령관": "class_53.png", "사령관": "class_54.png", "총사령관": "class_55.png" };
-    return `/images/${icons[seasonGrade] || 'class_00.png'}`;
+  const icons = {
+    특등이병: "class_00.png",
+    특등일병: "class_01.png",
+    특등상병: "class_02.png",
+    특급병장: "class_03.png",
+    "특전하사 1호봉": "class_04.png",
+    "특전하사 2호봉": "class_05.png",
+    "특전하사 3호봉": "class_06.png",
+    "특전하사 4호봉": "class_07.png",
+    "특전하사 5호봉": "class_08.png",
+    "특전중사 1호봉": "class_09.png",
+    "특전중사 2호봉": "class_10.png",
+    "특전중사 3호봉": "class_11.png",
+    "특전중사 4호봉": "class_12.png",
+    "특전중사 5호봉": "class_13.png",
+    "특전상사 1호봉": "class_14.png",
+    "특전상사 2호봉": "class_15.png",
+    "특전상사 3호봉": "class_16.png",
+    "특전상사 4호봉": "class_17.png",
+    "특전상사 5호봉": "class_18.png",
+    "특임소위 1호봉": "class_19.png",
+    "특임소위 2호봉": "class_20.png",
+    "특임소위 3호봉": "class_21.png",
+    "특임소위 4호봉": "class_22.png",
+    "특임소위 5호봉": "class_23.png",
+    "특임중위 1호봉": "class_24.png",
+    "특임중위 2호봉": "class_25.png",
+    "특임중위 3호봉": "class_26.png",
+    "특임중위 4호봉": "class_27.png",
+    "특임중위 5호봉": "class_28.png",
+    "특임대위 1호봉": "class_29.png",
+    "특임대위 2호봉": "class_30.png",
+    "특임대위 3호봉": "class_31.png",
+    "특임대위 4호봉": "class_32.png",
+    "특임대위 5호봉": "class_33.png",
+    "특공소령 1호봉": "class_34.png",
+    "특공소령 2호봉": "class_35.png",
+    "특공소령 3호봉": "class_36.png",
+    "특공소령 4호봉": "class_37.png",
+    "특공소령 5호봉": "class_38.png",
+    "특공중령 1호봉": "class_39.png",
+    "특공중령 2호봉": "class_40.png",
+    "특공중령 3호봉": "class_41.png",
+    "특공중령 4호봉": "class_42.png",
+    "특공중령 5호봉": "class_43.png",
+    "특공대령 1호봉": "class_44.png",
+    "특공대령 2호봉": "class_45.png",
+    "특공대령 3호봉": "class_46.png",
+    "특공대령 4호봉": "class_47.png",
+    "특공대령 5호봉": "class_48.png",
+    특급준장: "class_49.png",
+    특급소장: "class_50.png",
+    특급중장: "class_51.png",
+    특급대장: "class_52.png",
+    부사령관: "class_53.png",
+    사령관: "class_54.png",
+    총사령관: "class_55.png",
+  };
+  return `/images/${icons[seasonGrade] || "class_00.png"}`;
 }
 
 // --- HTML 생성 함수 ---
 function createMatchDetailPlayer(player) {
-    // 킬 성공률을 퍼센트로 계산: 킬 / (킬 + 데스) * 100
-    const totalEngagements = player.kill + player.death;
-    const percentage = totalEngagements === 0 ? 0 : (player.kill / totalEngagements) * 100;
-    const kdRatio = percentage % 1 === 0 ? `${percentage}%` : `${percentage.toFixed(2)}%`;
-    const isCurrentUser = player.user_name === currentNickname;
-    const currentUserClass = isCurrentUser ? ' current-user' : '';
-    
-    return `
+  // 킬 성공률을 퍼센트로 계산: 킬 / (킬 + 데스) * 100
+  const totalEngagements = player.kill + player.death;
+  const percentage = totalEngagements === 0 ? 0 : (player.kill / totalEngagements) * 100;
+  const kdRatio = percentage % 1 === 0 ? `${percentage}%` : `${percentage.toFixed(2)}%`;
+  const isCurrentUser = player.user_name === currentNickname;
+  const currentUserClass = isCurrentUser ? " current-user" : "";
+
+  return `
         <li class="match-team-item${currentUserClass}">
             <a href="/score?nickname=${encodeURIComponent(player.user_name)}" class="btn-search-player" data-link>
                 <p class="match-team-text">
@@ -65,27 +122,27 @@ function createMatchDetailPlayer(player) {
 
 function createMatchItemElement(matchData) {
   console.log("createMatchItemElement matchData", matchData);
-    const li = document.createElement("li");
-    li.className = "match-history-item";
+  const li = document.createElement("li");
+  li.className = "match-history-item";
 
-    // KDA, result 등은 요약 정보(matchData 최상위)에 정확히 있음
-    const { kill = 0, death = 0, assist = 0, match_result } = matchData;
+  // KDA, result 등은 요약 정보(matchData 최상위)에 정확히 있음
+  const { kill = 0, death = 0, assist = 0, match_result } = matchData;
 
-    // Headshot, Damage는 상세 정보(match_detail)에서 현재 닉네임 기준으로 찾아야 함
-    const matchDetailArray = matchData.match_detail || [];
-    const myPlayerDetail = matchDetailArray.find(p => p.user_name === currentNickname) || {};
+  // Headshot, Damage는 상세 정보(match_detail)에서 현재 닉네임 기준으로 찾아야 함
+  const matchDetailArray = matchData.match_detail || [];
+  const myPlayerDetail = matchDetailArray.find((p) => p.user_name === currentNickname) || {};
 
-    const headshot = myPlayerDetail.headshot !== undefined ? myPlayerDetail.headshot : 0;
-    const damage = myPlayerDetail.damage !== undefined ? myPlayerDetail.damage : 0;
-    
-    const matchResultText = RESULT_KEY_VALUE[match_result] || RESULT_KEY_VALUE.DEFAULT;
-    const resultClass = matchResultText === "승리" ? "win" : matchResultText === "패배" ? "lose" : "draw";
-    // 킬 성공률을 퍼센트로 계산: 킬 / (킬 + 데스) * 100
-    const totalEngagements = kill + death;
-    const percentage = totalEngagements === 0 ? 0 : (kill / totalEngagements) * 100;
-    const kdRatio = percentage % 1 === 0 ? `${percentage}%` : `${percentage.toFixed(2)}%`;
+  const headshot = myPlayerDetail.headshot !== undefined ? myPlayerDetail.headshot : 0;
+  const damage = myPlayerDetail.damage !== undefined ? myPlayerDetail.damage : 0;
 
-    li.innerHTML = `
+  const matchResultText = RESULT_KEY_VALUE[match_result] || RESULT_KEY_VALUE.DEFAULT;
+  const resultClass = matchResultText === "승리" ? "win" : matchResultText === "패배" ? "lose" : "draw";
+  // 킬 성공률을 퍼센트로 계산: 킬 / (킬 + 데스) * 100
+  const totalEngagements = kill + death;
+  const percentage = totalEngagements === 0 ? 0 : (kill / totalEngagements) * 100;
+  const kdRatio = percentage % 1 === 0 ? `${percentage}%` : `${percentage.toFixed(2)}%`;
+
+  li.innerHTML = `
         <section class="match-preview-section" data-match-id="${matchData.match_id}">
              <div class="match-result-box ${resultClass}"></div>
             <section class="match-padding-section">
@@ -95,7 +152,7 @@ function createMatchItemElement(matchData) {
                     <p class="match-date-text">${getTimeAgo(matchData.date_match)}</p>
                 </div>
                 <div class="match-map-box">
-                    <p class="match-map-text">${matchData.match_map || '맵 정보 없음'}</p>
+                    <p class="match-map-text">${matchData.match_map || "맵 정보 없음"}</p>
                 </div>
                 <section class="match-stats-section grid-full-width-section">
                     <div class="match-stats-box">
@@ -115,107 +172,114 @@ function createMatchItemElement(matchData) {
                         <p class="match-stats-value">${damage}</p>
                     </div>
                 </section>
-                <button class="btn-match-detail grid-full-width-section" type="button">▼</button>
+                                 <button class="btn-match-detail grid-full-width-section" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
+   <polygon points="4,4 20,4 12,16"></polygon>
+ </svg></button>
             </section>
         </section>
         <section class="user-match-detail-wrapper" style="display:none">
             <!-- 상세 정보가 여기에 로드됩니다 -->
         </section>`;
-    return li;
+  return li;
 }
 
 // --- 데이터 로딩 및 렌더링 함수 ---
 async function loadAndRenderMatches(page, listElement, buttonElement) {
-    if (isLoadingMore) return;
-    isLoadingMore = true;
+  if (isLoadingMore) return;
+  isLoadingMore = true;
 
+  if (buttonElement) {
+    buttonElement.textContent = "불러오는 중...";
+    buttonElement.disabled = true;
+  }
+
+  const startIndex = (page - 1) * MATCHES_PER_PAGE;
+  const endIndex = page * MATCHES_PER_PAGE;
+  const matchesToFetch = allMatches.slice(startIndex, endIndex);
+
+  if (page === 1) {
+    listElement.innerHTML = ""; // 첫 페이지일 경우, 기존 내용 삭제
+  }
+
+  if (matchesToFetch.length === 0 && page > 1) {
+    if (buttonElement) buttonElement.textContent = "더 이상 기록이 없습니다.";
+    isLoadingMore = false;
+    return;
+  }
+
+  try {
+    const detailPromises = matchesToFetch.map((match) => apiService.getMatchDetail(match.match_id));
+    const detailResults = await Promise.allSettled(detailPromises);
+
+    detailResults.forEach((result, index) => {
+      const summaryData = matchesToFetch[index];
+      if (result.status === "fulfilled" && result.value.success) {
+        const combinedData = { ...summaryData, ...result.value.data };
+        const matchItemElement = createMatchItemElement(combinedData);
+        listElement.appendChild(matchItemElement);
+      } else {
+        const matchItemElement = createMatchItemElement(summaryData);
+        listElement.appendChild(matchItemElement);
+        console.warn(`Failed to fetch detail for match ${summaryData.match_id}`, result.reason);
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching match details:", error);
+    if (listElement.lastChild) {
+      listElement.lastChild.innerHTML = "<p>기록을 불러오는 중 오류가 발생했습니다.</p>";
+    }
+  } finally {
+    isLoadingMore = false;
     if (buttonElement) {
-        buttonElement.textContent = '불러오는 중...';
-        buttonElement.disabled = true;
+      if (endIndex >= allMatches.length) {
+        buttonElement.style.display = "none";
+      } else {
+        buttonElement.textContent = "기록 더 보기";
+        buttonElement.disabled = false;
+      }
     }
-
-    const startIndex = (page - 1) * MATCHES_PER_PAGE;
-    const endIndex = page * MATCHES_PER_PAGE;
-    const matchesToFetch = allMatches.slice(startIndex, endIndex);
-
-    if (page === 1) {
-        listElement.innerHTML = ''; // 첫 페이지일 경우, 기존 내용 삭제
-    }
-
-    if (matchesToFetch.length === 0 && page > 1) {
-        if(buttonElement) buttonElement.textContent = '더 이상 기록이 없습니다.';
-        isLoadingMore = false;
-        return;
-    }
-
-    try {
-        const detailPromises = matchesToFetch.map(match => apiService.getMatchDetail(match.match_id));
-        const detailResults = await Promise.allSettled(detailPromises);
-
-        detailResults.forEach((result, index) => {
-            const summaryData = matchesToFetch[index];
-            if (result.status === 'fulfilled' && result.value.success) {
-                const combinedData = { ...summaryData, ...result.value.data };
-                const matchItemElement = createMatchItemElement(combinedData);
-                listElement.appendChild(matchItemElement);
-            } else {
-                const matchItemElement = createMatchItemElement(summaryData);
-                listElement.appendChild(matchItemElement);
-                console.warn(`Failed to fetch detail for match ${summaryData.match_id}`, result.reason);
-            }
-        });
-
-    } catch (error) {
-        console.error("Error fetching match details:", error);
-        if (listElement.lastChild) {
-            listElement.lastChild.innerHTML = '<p>기록을 불러오는 중 오류가 발생했습니다.</p>';
-        }
-    } finally {
-        isLoadingMore = false;
-        if (buttonElement) {
-            if (endIndex >= allMatches.length) {
-                buttonElement.style.display = 'none';
-            } else {
-                buttonElement.textContent = '기록 더 보기';
-                buttonElement.disabled = false;
-            }
-        }
-    }
+  }
 }
 
 // --- 이벤트 핸들러 ---
 async function handleDetailToggle(e) {
-    const detailButton = e.target.closest('.btn-match-detail');
-    if (!detailButton) return;
-    
-    const matchItem = detailButton.closest('.match-history-item');
-    const detailWrapper = matchItem.querySelector('.user-match-detail-wrapper');
-    const isHidden = detailWrapper.style.display === 'none';
+  const detailButton = e.target.closest(".btn-match-detail");
+  if (!detailButton) return;
 
-    document.querySelectorAll('.user-match-detail-wrapper').forEach(el => el.style.display = 'none');
-    
-    if (isHidden) {
-        detailWrapper.style.display = 'block';
-        if (!detailWrapper.dataset.loaded) {
-            const matchId = matchItem.querySelector('.match-preview-section').dataset.matchId;
-            await loadMatchDetail(matchId, detailWrapper);
-        }
+  const matchItem = detailButton.closest(".match-history-item");
+  const detailWrapper = matchItem.querySelector(".user-match-detail-wrapper");
+  const isHidden = detailWrapper.style.display === "none";
+
+  // 모든 상세 정보 숨기기 및 모든 버튼에서 active 클래스 제거
+  document.querySelectorAll(".user-match-detail-wrapper").forEach((el) => (el.style.display = "none"));
+  document.querySelectorAll(".btn-match-detail").forEach((btn) => btn.classList.remove("active"));
+
+  if (isHidden) {
+    detailWrapper.style.display = "block";
+    detailButton.classList.add("active"); // 현재 버튼에 active 클래스 추가
+    if (!detailWrapper.dataset.loaded) {
+      const matchId = matchItem.querySelector(".match-preview-section").dataset.matchId;
+      await loadMatchDetail(matchId, detailWrapper);
     }
+  }
 }
 
 async function loadMatchDetail(matchId, wrapperElement) {
-    wrapperElement.innerHTML = `<section class="match-detail-loading"><p>상세 정보를 불러오는 중입니다...</p></section>`;
-    wrapperElement.dataset.loaded = "true";
+  wrapperElement.innerHTML = ` <div class="loading-indicator">
+                <div class="spinner"></div>
+                <p>Loading...</p>
+            </div>`;
+  wrapperElement.dataset.loaded = "true";
 
-    try {
-        const result = await apiService.getMatchDetail(matchId);
-        if (result.success && result.data.match_detail) {
-            const winPlayers = result.data.match_detail.filter(p => p.match_result === "1");
-            const losePlayers = result.data.match_detail.filter(p => p.match_result !== "1");
-            
-            const createTeamSection = (team, title, resultClass) => {
-                if(team.length === 0) return '';
-                return `
+  try {
+    const result = await apiService.getMatchDetail(matchId);
+    if (result.success && result.data.match_detail) {
+      const winPlayers = result.data.match_detail.filter((p) => p.match_result === "1");
+      const losePlayers = result.data.match_detail.filter((p) => p.match_result !== "1");
+
+      const createTeamSection = (team, title, resultClass) => {
+        if (team.length === 0) return "";
+        return `
                     <section class="match-team-section ${resultClass}">
                         <section class="match-team-header-section ${resultClass}">
                             <p class="match-header-text ${resultClass}">${title}</p>
@@ -229,42 +293,41 @@ async function loadMatchDetail(matchId, wrapperElement) {
                                 <li class="match-team-label-item"><p class="match-team-label-text">딜량</p></li>
                             </ul>
                             <ul class="match-team-list">
-                                ${team.map(createMatchDetailPlayer).join('')}
+                                ${team.map(createMatchDetailPlayer).join("")}
                             </ul>
                         </section>
                     </section>
                 `;
-            }
-            
-            wrapperElement.innerHTML = `
+      };
+
+      wrapperElement.innerHTML = `
                 <section class="match-detail-section">
-                    ${createTeamSection(winPlayers, '승리', 'win')}
-                    ${createTeamSection(losePlayers, '패배', 'lose')}
+                    ${createTeamSection(winPlayers, "승리", "win")}
+                    ${createTeamSection(losePlayers, "패배", "lose")}
                 </section>`;
-        } else {
-            wrapperElement.innerHTML = `<p>상세 정보가 없습니다.</p>`;
-        }
-    } catch (error) {
-        console.error(`Error fetching match detail for ${matchId}:`, error);
-        wrapperElement.innerHTML = `<p>상세 정보를 불러오는 데 실패했습니다.</p>`;
+    } else {
+      wrapperElement.innerHTML = `<p>상세 정보가 없습니다.</p>`;
     }
+  } catch (error) {
+    console.error(`Error fetching match detail for ${matchId}:`, error);
+    wrapperElement.innerHTML = `<p>상세 정보를 불러오는 데 실패했습니다.</p>`;
+  }
 }
 
 // --- 메인 컴포넌트 함수 ---
 export async function renderScoreDetail(targetElement, props = {}) {
-    
-    reCallProps = props;
-    reCallTargetElement = targetElement;
+  reCallProps = props;
+  reCallTargetElement = targetElement;
 
-    currentPage = 1;
-    const { matchList, userOuid, nickname } = props;
-    allMatches = matchList?.match || [];
-    currentUserOuid = userOuid;
-    currentNickname = nickname;
+  currentPage = 1;
+  const { matchList, userOuid, nickname } = props;
+  allMatches = matchList?.match || [];
+  currentUserOuid = userOuid;
+  currentNickname = nickname;
 
-    if (!targetElement) return;
+  if (!targetElement) return;
 
-    const baseHtml = `
+  const baseHtml = `
         <section class="card-component-wrapper">
             <section class="card-header-section">
                 <ul class="match-type-list" id="matchType">
@@ -282,57 +345,53 @@ export async function renderScoreDetail(targetElement, props = {}) {
             </section>
             <button class="btn-more-match-history">기록 더 보기</button>
         </section>`;
-    targetElement.innerHTML = baseHtml;
+  targetElement.innerHTML = baseHtml;
 
-    const matchHistoryListUl = targetElement.querySelector(".match-history-list");
-    const loadMoreButton = targetElement.querySelector('.btn-more-match-history');
-    const matchTypeUl = targetElement.querySelector("#matchType");
+  const matchHistoryListUl = targetElement.querySelector(".match-history-list");
+  const loadMoreButton = targetElement.querySelector(".btn-more-match-history");
+  const matchTypeUl = targetElement.querySelector("#matchType");
 
-    // 활성화된 버튼 표시
-    const currentActiveButton = matchTypeUl.querySelector(`li[data-value="${currentMatchType}"] button`);
-    if (currentActiveButton) {
-        currentActiveButton.classList.add("active");
-    } else {
-        matchTypeUl.querySelector(`li[data-value=""] button`).classList.add("active");
-    }
+  // 활성화된 버튼 표시
+  const currentActiveButton = matchTypeUl.querySelector(`li[data-value="${currentMatchType}"] button`);
+  if (currentActiveButton) {
+    currentActiveButton.classList.add("active");
+  } else {
+    matchTypeUl.querySelector(`li[data-value=""] button`).classList.add("active");
+  }
 
-    // 매치 타입 필터링 이벤트 리스너
-    matchTypeUl.querySelectorAll(".match-type-item button").forEach(button => {
-        button.addEventListener("click", async (e) => {
-            const li = e.target.closest(".match-type-item");
-            const newMatchType = li.dataset.value;
+  // 매치 타입 필터링 이벤트 리스너
+  matchTypeUl.querySelectorAll(".match-type-item button").forEach((button) => {
+    button.addEventListener("click", async (e) => {
+      const li = e.target.closest(".match-type-item");
+      const newMatchType = li.dataset.value;
 
-            // 이미 선택된 타입이면 아무것도 안함
-            if (newMatchType === currentMatchType) return;
+      // 이미 선택된 타입이면 아무것도 안함
+      if (newMatchType === currentMatchType) return;
 
-            currentMatchType = newMatchType;
-            
-            const matchList = await apiService.getMatchListFilterByType(
-                reCallProps.userOuid, 
-                "폭파미션",
-                currentMatchType
-            );
-            
-            reCallProps.matchList = matchList.data;
-            await renderScoreDetail(reCallTargetElement, reCallProps);
-        });
+      currentMatchType = newMatchType;
+
+      const matchList = await apiService.getMatchListFilterByType(reCallProps.userOuid, "폭파미션", currentMatchType);
+
+      reCallProps.matchList = matchList.data;
+      await renderScoreDetail(reCallTargetElement, reCallProps);
     });
+  });
 
-    if (allMatches.length === 0) {
-        matchHistoryListUl.innerHTML = '<li class="match-history-item"><p>표시할 매치 기록이 없습니다.</p></li>';
-        loadMoreButton.style.display = 'none';
-        return;
-    }
+  if (allMatches.length === 0) {
+    matchHistoryListUl.innerHTML = '<li class="match-history-item"><p>표시할 매치 기록이 없습니다.</p></li>';
+    loadMoreButton.style.display = "none";
+    return;
+  }
 
-    // 첫 페이지 로드
-    await loadAndRenderMatches(currentPage, matchHistoryListUl, loadMoreButton);
+  // 첫 페이지 로드
+  await loadAndRenderMatches(currentPage, matchHistoryListUl, loadMoreButton);
 
-    // '기록 더 보기' 이벤트 리스너
-    loadMoreButton.addEventListener('click', () => {
-        currentPage++;
-        loadAndRenderMatches(currentPage, matchHistoryListUl, loadMoreButton);
-    });
+  // '기록 더 보기' 이벤트 리스너
+  loadMoreButton.addEventListener("click", () => {
+    currentPage++;
+    loadAndRenderMatches(currentPage, matchHistoryListUl, loadMoreButton);
+  });
 
-    // 매치 상세 토글 이벤트 리스너
-    matchHistoryListUl.addEventListener('click', handleDetailToggle);
+  // 매치 상세 토글 이벤트 리스너
+  matchHistoryListUl.addEventListener("click", handleDetailToggle);
 }
