@@ -484,7 +484,7 @@ exports.handler = async function (event, context) {
       const ouid = new URLSearchParams(queryParams).get("ouid");
       console.log("OUID:", ouid);
 
-      if (!ouid && endpoint !== "match" && endpoint !== "chzzk-lives") {
+      if (!ouid && endpoint !== "match" && endpoint !== "match-detail" && endpoint !== "chzzk-lives") {
         console.error("OUID 파라미터 누락");
         return {
           statusCode: 400,
@@ -505,6 +505,24 @@ exports.handler = async function (event, context) {
         params = `ouid=${ouid}&match_mode=${encodeURIComponent(matchMode)}`;
 
         console.log("🔄 모든 매치 타입 조회 설정:", params);
+      } else if (endpoint === "match-detail") {
+        // 매치 상세 조회는 match_id 파라미터만 사용
+        const matchId = new URLSearchParams(queryParams).get("match_id");
+        
+        if (!matchId) {
+          console.error("match_id 파라미터 누락");
+          return {
+            statusCode: 400,
+            headers: corsHeaders,
+            body: JSON.stringify({
+              success: false,
+              error: "match_id 파라미터가 필요합니다.",
+            }),
+          };
+        }
+        
+        params = `match_id=${matchId}`;
+        console.log("매치 상세 조회 설정:", params);
       } else if (endpoint === "chzzk-lives") {
         // 치지직 라이브는 OUID 파라미터 제거
         const size = new URLSearchParams(queryParams).get("size") || "20";
