@@ -10,6 +10,9 @@ let currentUserOuid = null;
 let currentNickname = null;
 let isLoadingMore = false;
 
+let reCallProps = null;
+let reCallTargetElement = null;
+
 // --- 순수 헬퍼 함수 ---
 function getTimeAgo(dateMatchString) {
     if (!dateMatchString) return "-";
@@ -167,6 +170,33 @@ async function loadAndRenderMatches(page, listElement, buttonElement) { // 👈 
             }
         }
     }
+
+    const matchTypeUl = document.getElementById("matchType");
+
+    // 매치 타입 클릭이벤트
+    Array.from(matchTypeUl.querySelectorAll(".match-type-item button")).forEach(
+    function (button) {
+      button.addEventListener("click", async function () {
+        const li = button.closest(".match-type-item");
+        const matchList = await apiService.getMatchListFilterByType(
+            reCallProps.userOuid, 
+            "폭파미션",
+            li.dataset.value // 카테고리 넣어줌 클랜전, 개인전, 토너먼트
+        )
+        
+        reCallProps.matchList = matchList.data
+        await renderScoreDetail(reCallTargetElement, reCallProps);
+
+
+        const alreadySelected = matchTypeUl.querySelector(".active");
+        alreadySelected.classList.remove("active");
+
+        const targetLi = matchTypeUl.querySelector(`li[data-value="${li.dataset.value}"`);
+        targetLi.firstElementChild.classList.add("active");
+
+      });
+    }
+  );
 }
 
 // --- 이벤트 핸들러 ---
@@ -221,6 +251,10 @@ async function loadMatchDetail(matchId, wrapperElement) {
 
 // --- 메인 컴포넌트 함수 ---
 export async function renderScoreDetail(targetElement, props = {}) {
+    
+    reCallProps = props;
+    reCallTargetElement = targetElement;
+
     currentPage = 1;
     const { matchList, userOuid, nickname } = props;
     allMatches = matchList?.match || [];
@@ -233,7 +267,7 @@ export async function renderScoreDetail(targetElement, props = {}) {
         <section class="card-component-wrapper">
             <section class="card-header-section">
                 <ul class="match-type-list" id="matchType">
-                    <li class="match-type-item" data-value=""><button class="btn-match-type active">전체</button></li>
+                    <li class="match-type-item" data-value=""><button class="btn-match-type">전체</button></li>
                     <li class="match-type-item" data-value="퀵매치 클랜전"><button class="btn-match-type">클랜전</button></li>
                     <li class="match-type-item" data-value="랭크전 솔로"><button class="btn-match-type">솔로 랭크</button></li>
                     <li class="match-type-item" data-value="랭크전 파티"><button class="btn-match-type">파티 랭크</button></li>
