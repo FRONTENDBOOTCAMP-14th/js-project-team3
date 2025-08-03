@@ -116,7 +116,7 @@
 }
 
 .match-type-box .match-result-text {
-  font-size: var(--font-size-XS);
+  font-size: 0.93rem;
 }
 
 .match-type-box .match-result-text .win {
@@ -132,7 +132,7 @@
 }
 
 .match-type-box .match-type-text {
-  font-size: var(--font-size-XS);
+  font-size: 0.93rem;
   color: #eaeaea;
 }
 
@@ -158,7 +158,7 @@
 }
 
 .match-map-box .match-map-text {
-  font-size: var(--font-size-XS);
+  font-size: 0.93rem;
   color: #eaeaea;
 }
 
@@ -185,7 +185,7 @@
   display: flex;
   align-items: center;
   gap: .125rem;
-  font-size: var(--font-size-XXS);
+  font-size: 0.8rem;
   color: #aaa;
 }
 
@@ -199,6 +199,10 @@
   align-items: center;
   font-size: .9375rem;
   color: #eaeaea;
+}
+
+.match-stats-value {
+  font-size: 0.93rem;
 }
 
 .match-stats-box .match-stats-text .rate-orange {
@@ -323,22 +327,21 @@
 }
 
 .match-team-body-section .match-team-label-list {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1fr 1.2fr;
   list-style: none;
   padding: 0;
   margin: 0;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .match-team-label-list .match-team-label-item {
-  width: 100%;
-  padding: .375rem .625rem;
+  padding: .5rem .625rem;
+  border-bottom: .0625rem solid #333;
 }
 
 .match-team-label-list .match-team-label-item p {
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
   margin: 0;
-  border-bottom: .0625rem solid #333;
 }
 
 .match-team-label-item .match-team-label-text {
@@ -346,15 +349,11 @@
   color: #aaa;
   white-space: nowrap; 
   text-align: center;
-  min-width: 5rem;
+  font-weight: 600;
 }
 
-/* .match-team-label-item p span:first-child {
-  white-space: nowrap;
-} */
-
-.match-team-label-item p span:nth-child(2) {
-  margin-left: auto;
+.match-team-label-item:first-child .match-team-label-text {
+  text-align: left;
 }
 
 .match-team-list {
@@ -364,43 +363,41 @@
 }
 
 .match-team-list .match-team-item {
-  width: 100%;
-  padding: .375rem .625rem;
-}
-
-.match-team-list .match-team-item p {
   border-bottom: .0625rem solid #333;
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  margin: 0;
 }
 
-.match-team-list .search-player{
-  display: flex;
-  align-items: center; 
-  flex-wrap: nowrap; 
+.match-team-list .match-team-item:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.match-team-list .match-team-item.current-user {
+  background-color: var(--main-color);
+}
+
+
+.match-team-list .btn-search-player {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1fr 1.2fr;
+  align-items: center;
+  padding: .5rem .625rem;
   transition: background-color .2s ease;
   text-decoration: none;
   width: 100%;
+  box-sizing: border-box;
 }
 
-.search-player .match-team-text {
-  font-size: var(--font-size-S);
+.btn-search-player .match-team-text {
+  font-size: 0.93rem;
   color: #eaeaea;
   white-space: nowrap; 
-  flex-grow: 0;   
-  flex-shrink: 0;  
-  flex-basis: auto; 
   text-align: center;
-  width: 5rem;
+  margin: 0;
 }
 
-.search-player .match-team-text:first-child {
+.btn-search-player .match-team-text:first-child {
   display: flex;
   align-items: center;
-  white-space: nowrap;
-  padding-left: 0;
+  text-align: left;
   justify-content: flex-start;
 }
 
@@ -408,12 +405,50 @@
   width: 1.25rem;
   height: 1.25rem;
   flex-shrink: 0;
-  margin-right: .1875rem;
+  margin-right: .375rem;
   vertical-align: middle;
 }
 
-.search-player .match-team-text:nth-child(2) {
-  margin-left: auto;
+.btn-more-match-history {
+  display: flex;
+  justify-self: center;
+  align-self: center;
+  color: #eaeaea;
+  margin: 10px;
+}
+
+.btn-more-match-history:hover {
+  filter:opacity(0.7);
+}
+
+@media (max-width: 479px) {
+  .match-team-body-section .match-team-label-list {
+    grid-template-columns: 2fr 1fr 1.5fr;
+  }
+
+  .match-team-list .btn-search-player {
+    grid-template-columns: 2fr 1fr 1.5fr;
+  }
+
+  .match-padding-section .match-stats-section {
+    grid-template-columns: 2fr 1fr 1.5fr;
+  }
+
+  .match-team-label-list .match-team-label-item:nth-child(4),
+  .match-team-label-list .match-team-label-item:nth-child(5) {
+    display: none;
+  }
+
+  .btn-search-player .match-team-text:nth-child(4),
+  .btn-search-player .match-team-text:nth-child(5) {
+    display: none;
+  }
+
+  .match-stats-section .match-stats-box:nth-child(1),
+  .match-stats-section .match-stats-box:nth-child(3),
+  .match-stats-section .match-stats-box:nth-child(4) {
+    display: none;
+  }
 }
 
 @media (min-width: 1025px) {
