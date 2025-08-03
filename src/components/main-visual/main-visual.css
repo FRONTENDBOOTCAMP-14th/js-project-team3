@@ -36,6 +36,12 @@
 }
 
 @media (max-width: 768px) {
+  .visual {
+    margin-top: 3.75rem;
+  }
+}
+
+@media (max-width: 768px) {
   .main-visual {
     height: 600px;
     align-items: flex-start;
