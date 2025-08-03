@@ -16,6 +16,9 @@ export default defineConfig({
     cssCodeSplit: false,
     minify: 'esbuild',
     target: 'es2015',
+    esbuild: {
+      drop: ['console', 'debugger'],
+    },
   },
 
   css: {
