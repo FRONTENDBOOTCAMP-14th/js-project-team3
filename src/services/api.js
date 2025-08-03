@@ -305,6 +305,45 @@ Nexon Open API 키는 https://openapi.nexon.com/ 에서 발급받을 수 있습�
   async getYoutubeLives(query = "서든어택", maxResults = 10) {
     return await this.request("youtube-lives", { query, maxResults });
   }
+
+  
+  // 매치 목록을 매치 타입 별로 조회
+  async getMatchListFilterByType(ouid, match_mode = "폭파미션", match_type = "") {
+    try {
+      if (this.isDevelopment) {
+        const apiKey = this.getApiKey();
+        if (apiKey) {
+          return await this.directRequest("/match", {
+            ouid,
+            match_mode,
+            match_type,
+          });
+        } else {
+          return await this.request("match", {
+            ouid,
+            match_mode,
+            match_type,
+          });
+        }
+      } else {
+        return await this.request("match", {
+          ouid,
+          match_mode,
+          match_type,
+        });
+      }
+    } catch (error) {
+      if (this.isDevelopment) {
+        return await this.request("match", {
+          ouid,
+          match_mode,
+        });
+      }
+      throw error;
+    }
+  }
+
+
 }
 
 // 싱글톤 인스턴스 생성
