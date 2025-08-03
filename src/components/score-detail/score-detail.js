@@ -9,6 +9,7 @@ let allMatches = [];
 let currentUserOuid = null;
 let currentNickname = null;
 let isLoadingMore = false;
+let currentMatchType = ""; // 현재 선택된 매치 필터 타입을 저장
 
 let reCallProps = null;
 let reCallTargetElement = null;
@@ -40,19 +41,26 @@ function getRankIcon(seasonGrade) {
 
 // --- HTML 생성 함수 ---
 function createMatchDetailPlayer(player) {
-    const kdRatio = player.death === 0 ? player.kill.toFixed(2) : (player.kill / player.death).toFixed(2);
-    const li = document.createElement("li");
-    li.className = "match-team-item";
-    li.innerHTML = `
-        <a href="/score?nickname=${encodeURIComponent(player.user_name)}" class="btn-search-player" data-link>
-            <img class="img-grade" src="${getRankIcon(player.season_grade)}" alt="${player.season_grade}" />
-            <p class="match-team-text">${player.user_name}</p>
-            <p class="match-team-text">${kdRatio}</p>
-            <p class="match-team-text">${player.kill} / ${player.death} / ${player.assist}</p>
-            <p class="match-team-text">${player.headshot}</p>
-            <p class="match-team-text">${player.damage.toLocaleString("ko-KR")}</p>
-        </a>`;
-    return li;
+    // 킬 성공률을 퍼센트로 계산: 킬 / (킬 + 데스) * 100
+    const totalEngagements = player.kill + player.death;
+    const percentage = totalEngagements === 0 ? 0 : (player.kill / totalEngagements) * 100;
+    const kdRatio = percentage % 1 === 0 ? `${percentage}%` : `${percentage.toFixed(2)}%`;
+    const isCurrentUser = player.user_name === currentNickname;
+    const currentUserClass = isCurrentUser ? ' current-user' : '';
+    
+    return `
+        <li class="match-team-item${currentUserClass}">
+            <a href="/score?nickname=${encodeURIComponent(player.user_name)}" class="btn-search-player" data-link>
+                <p class="match-team-text">
+                    <img class="img-grade" src="${getRankIcon(player.season_grade)}" alt="${player.season_grade}" />
+                    ${player.user_name}
+                </p>
+                <p class="match-team-text">${kdRatio}</p>
+                <p class="match-team-text">${player.kill} / ${player.death} / ${player.assist}</p>
+                <p class="match-team-text">${player.headshot}</p>
+                <p class="match-team-text">${player.damage.toLocaleString("ko-KR")}</p>
+            </a>
+        </li>`;
 }
 
 function createMatchItemElement(matchData) {
@@ -72,7 +80,10 @@ function createMatchItemElement(matchData) {
     
     const matchResultText = RESULT_KEY_VALUE[match_result] || RESULT_KEY_VALUE.DEFAULT;
     const resultClass = matchResultText === "승리" ? "win" : matchResultText === "패배" ? "lose" : "draw";
-    const kdRatio = death === 0 ? kill.toFixed(2) : (kill / death).toFixed(2);
+    // 킬 성공률을 퍼센트로 계산: 킬 / (킬 + 데스) * 100
+    const totalEngagements = kill + death;
+    const percentage = totalEngagements === 0 ? 0 : (kill / totalEngagements) * 100;
+    const kdRatio = percentage % 1 === 0 ? `${percentage}%` : `${percentage.toFixed(2)}%`;
 
     li.innerHTML = `
         <section class="match-preview-section" data-match-id="${matchData.match_id}">
@@ -104,7 +115,9 @@ function createMatchItemElement(matchData) {
                         <p class="match-stats-value">${damage}</p>
                     </div>
                 </section>
-                <button class="btn-match-detail grid-full-width-section" type="button">▼</button>
+                <button class="btn-match-detail grid-full-width-section" type="button">
+                    <img src="/icon/triagle.svg" alt="매치 상세 버튼" class="icon-match-detail"/>
+                </button>
             </section>
         </section>
         <section class="user-match-detail-wrapper" style="display:none">
@@ -114,7 +127,7 @@ function createMatchItemElement(matchData) {
 }
 
 // --- 데이터 로딩 및 렌더링 함수 ---
-async function loadAndRenderMatches(page, listElement, buttonElement) { // 👈 [수정 2] 요소들을 인자로 받음
+async function loadAndRenderMatches(page, listElement, buttonElement) {
     if (isLoadingMore) return;
     isLoadingMore = true;
 
@@ -170,33 +183,6 @@ async function loadAndRenderMatches(page, listElement, buttonElement) { // 👈 
             }
         }
     }
-
-    const matchTypeUl = document.getElementById("matchType");
-
-    // 매치 타입 클릭이벤트
-    Array.from(matchTypeUl.querySelectorAll(".match-type-item button")).forEach(
-    function (button) {
-      button.addEventListener("click", async function () {
-        const li = button.closest(".match-type-item");
-        const matchList = await apiService.getMatchListFilterByType(
-            reCallProps.userOuid, 
-            "폭파미션",
-            li.dataset.value // 카테고리 넣어줌 클랜전, 개인전, 토너먼트
-        )
-        
-        reCallProps.matchList = matchList.data
-        await renderScoreDetail(reCallTargetElement, reCallProps);
-
-
-        const alreadySelected = matchTypeUl.querySelector(".active");
-        alreadySelected.classList.remove("active");
-
-        const targetLi = matchTypeUl.querySelector(`li[data-value="${li.dataset.value}"`);
-        targetLi.firstElementChild.classList.add("active");
-
-      });
-    }
-  );
 }
 
 // --- 이벤트 핸들러 ---
@@ -209,9 +195,12 @@ async function handleDetailToggle(e) {
     const isHidden = detailWrapper.style.display === 'none';
 
     document.querySelectorAll('.user-match-detail-wrapper').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.btn-match-detail').forEach(btn => {btn.classList.remove('active')});
     
     if (isHidden) {
         detailWrapper.style.display = 'block';
+        detailButton.classList.add('active');
+        
         if (!detailWrapper.dataset.loaded) {
             const matchId = matchItem.querySelector('.match-preview-section').dataset.matchId;
             await loadMatchDetail(matchId, detailWrapper);
@@ -229,16 +218,33 @@ async function loadMatchDetail(matchId, wrapperElement) {
             const winPlayers = result.data.match_detail.filter(p => p.match_result === "1");
             const losePlayers = result.data.match_detail.filter(p => p.match_result !== "1");
             
+            const createTeamSection = (team, title, resultClass) => {
+                if(team.length === 0) return '';
+                return `
+                    <section class="match-team-section ${resultClass}">
+                        <section class="match-team-header-section ${resultClass}">
+                            <p class="match-header-text ${resultClass}">${title}</p>
+                        </section>
+                        <section class="match-team-body-section">
+                            <ul class="match-team-label-list">
+                                <li class="match-team-label-item"><p class="match-team-label-text">플레이어</p></li>
+                                <li class="match-team-label-item"><p class="match-team-label-text">킬뎃</p></li>
+                                <li class="match-team-label-item"><p class="match-team-label-text">KDA</p></li>
+                                <li class="match-team-label-item"><p class="match-team-label-text">헤드샷</p></li>
+                                <li class="match-team-label-item"><p class="match-team-label-text">딜량</p></li>
+                            </ul>
+                            <ul class="match-team-list">
+                                ${team.map(createMatchDetailPlayer).join('')}
+                            </ul>
+                        </section>
+                    </section>
+                `;
+            }
+            
             wrapperElement.innerHTML = `
                 <section class="match-detail-section">
-                    <section class="match-team-section win">
-                        <section class="match-team-header-section win"><p class="match-header-text win">승리</p></section>
-                        <ul class="match-team-body-section">${winPlayers.map(createMatchDetailPlayer).map(el => el.outerHTML).join('')}</ul>
-                    </section>
-                    <section class="match-team-section lose">
-                        <section class="match-team-header-section lose"><p class="match-header-text lose">패배</p></section>
-                        <ul class="match-team-body-section">${losePlayers.map(createMatchDetailPlayer).map(el => el.outerHTML).join('')}</ul>
-                    </section>
+                    ${createTeamSection(winPlayers, '승리', 'win')}
+                    ${createTeamSection(losePlayers, '패배', 'lose')}
                 </section>`;
         } else {
             wrapperElement.innerHTML = `<p>상세 정보가 없습니다.</p>`;
@@ -285,6 +291,37 @@ export async function renderScoreDetail(targetElement, props = {}) {
 
     const matchHistoryListUl = targetElement.querySelector(".match-history-list");
     const loadMoreButton = targetElement.querySelector('.btn-more-match-history');
+    const matchTypeUl = targetElement.querySelector("#matchType");
+
+    // 활성화된 버튼 표시
+    const currentActiveButton = matchTypeUl.querySelector(`li[data-value="${currentMatchType}"] button`);
+    if (currentActiveButton) {
+        currentActiveButton.classList.add("active");
+    } else {
+        matchTypeUl.querySelector(`li[data-value=""] button`).classList.add("active");
+    }
+
+    // 매치 타입 필터링 이벤트 리스너
+    matchTypeUl.querySelectorAll(".match-type-item button").forEach(button => {
+        button.addEventListener("click", async (e) => {
+            const li = e.target.closest(".match-type-item");
+            const newMatchType = li.dataset.value;
+
+            // 이미 선택된 타입이면 아무것도 안함
+            if (newMatchType === currentMatchType) return;
+
+            currentMatchType = newMatchType;
+            
+            const matchList = await apiService.getMatchListFilterByType(
+                reCallProps.userOuid, 
+                "폭파미션",
+                currentMatchType
+            );
+            
+            reCallProps.matchList = matchList.data;
+            await renderScoreDetail(reCallTargetElement, reCallProps);
+        });
+    });
 
     if (allMatches.length === 0) {
         matchHistoryListUl.innerHTML = '<li class="match-history-item"><p>표시할 매치 기록이 없습니다.</p></li>';
@@ -293,13 +330,14 @@ export async function renderScoreDetail(targetElement, props = {}) {
     }
 
     // 첫 페이지 로드
-    await loadAndRenderMatches(currentPage, matchHistoryListUl, loadMoreButton); // 👈 [수정 3] 인자 전달
+    await loadAndRenderMatches(currentPage, matchHistoryListUl, loadMoreButton);
 
-    // 이벤트 리스너 설정
+    // '기록 더 보기' 이벤트 리스너
     loadMoreButton.addEventListener('click', () => {
         currentPage++;
-        loadAndRenderMatches(currentPage, matchHistoryListUl, loadMoreButton); // 👈 [수정 3] 인자 전달
+        loadAndRenderMatches(currentPage, matchHistoryListUl, loadMoreButton);
     });
 
+    // 매치 상세 토글 이벤트 리스너
     matchHistoryListUl.addEventListener('click', handleDetailToggle);
 }
