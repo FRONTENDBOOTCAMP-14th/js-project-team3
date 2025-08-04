@@ -107,23 +107,3 @@ JavaScript(바닐라), HTML, CSS로 구현하였으며, 넥슨 OPEN API를 활�
  [Nexon OPEN API (서든어택)](https://openapi.nexon.com/ko/game/suddenattack/?id=43)
 
 
----
-
-
-## 🔧 설치 및 실행 방법 (로컬 테스트용)
-
-```bash
-# 1. 프로젝트 클론
-git clone https://github.com/FRONTENDBOOTCAMP-14th/js-project-team3
-
-# 2. 폴더 이동
-cd js-project-team3
-
-# 3. .env 설정(Nexon OPEN API에서 받아야 함)
-VITE_NEXON_OPEN_API_KEY1=your_api_key_1
-VITE_NEXON_OPEN_API_KEY2=your_api_key_2
-...
-
-# 4. 로컬 서버 실행
-npx live-server
-
